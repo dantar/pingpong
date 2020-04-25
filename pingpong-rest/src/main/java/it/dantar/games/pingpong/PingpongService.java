@@ -22,15 +22,21 @@ public class PingpongService {
 	}
 
 	public void broadcastMessage(String message) {
+		List<SseEmitter> stale = new ArrayList<>();
 		players.forEach(p -> {
 			try {
 				p.send(message);
 				Logger.getLogger(this.getClass().getName()).info(String.format("Message sent!: %s", players.size()));
 			} catch (IOException e) {
-				Logger.getLogger(this.getClass().getName()).info(String.format("Complete with error: %s", players.size()));
 				p.completeWithError(e);
+				stale.add(p);
+				Logger.getLogger(this.getClass().getName()).info(String.format("Stale emitter: %s", players.size()));
 			}
 		});
+		stale.forEach(s->{			
+			players.remove(s);
+		});
+		Logger.getLogger(this.getClass().getName()).info(String.format("Removed stale emitters: %s", players.size()));
 	}
 	
 }
