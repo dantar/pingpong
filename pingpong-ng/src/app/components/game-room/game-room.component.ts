@@ -6,6 +6,7 @@ import { environment } from 'src/environments/environment';
 import { MessageDto } from 'src/app/models/operations-dto.model';
 import { FantascattiSseDto, PlayerReadyDto } from 'src/app/models/fantascatti.model';
 import { SharedDataService } from 'src/app/services/shared-data.service';
+import { FantascattiService } from 'src/app/services/fantascatti.service';
 
 @Component({
   selector: 'app-game-room',
@@ -19,6 +20,7 @@ export class GameRoomComponent implements OnInit {
     private rest: RestService,
     private changes: ChangeDetectorRef,
     public shared: SharedDataService,
+    private fantascatti: FantascattiService,
   ) { }
 
   table: TableDto;
@@ -39,7 +41,7 @@ export class GameRoomComponent implements OnInit {
   }
 
   initSse(uuid: string) {
-    this.sse = new EventSource(environment.server + '/table/sse/' + uuid);
+    this.sse = new EventSource(environment.server + '/fantascatti/sse/' + uuid);
     this.sse.addEventListener('message', message => {
       this.onSseEvent(JSON.parse(message.data) as MessageDto);
     })
@@ -62,7 +64,7 @@ export class GameRoomComponent implements OnInit {
   }
 
   iAmReady() {
-    this.rest.playerReady(this.table, this.shared.player).subscribe(
+    this.fantascatti.playerReady(this.table, this.shared.player).subscribe(
       // loading? 
     );
   }

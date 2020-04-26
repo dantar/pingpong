@@ -9,12 +9,6 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class RestService {
-  playerReady(table: TableDto, player: PlayerDto) {
-    return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + '/ready', player);
-  }
-  table(uuid: string): Observable<TableDto> {
-    return this.http.get<TableDto>(environment.server + '/table/' + uuid);
-  }
   
   constructor(private http: HttpClient) { }
 
@@ -32,6 +26,10 @@ export class RestService {
 
   tables(): Observable<TableDto[]> {
     return this.http.get<TableDto[]>(environment.server + '/tables');
+  }
+
+  table(uuid: string): Observable<TableDto> {
+    return this.http.get<TableDto>(environment.server + '/table/' + uuid);
   }
 
 }

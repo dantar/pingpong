@@ -6,6 +6,6 @@
     </div>
 </div>
 <div *ngIf="sse">
-    <div *ngIf="!ready.includes(shared.player.uuid)">Ready!</div>
+    <div *ngIf="!ready.includes(shared.player.uuid)" (click)="iAmReady()">Ready!</div>
 </div>
 

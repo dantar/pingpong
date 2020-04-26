@@ -22,7 +22,7 @@ public class SseController {
 		return pingpongService.newPlayerSse(uuid);
 	}
 
-	@GetMapping("/table/sse/{uuid}")
+	@GetMapping("/fantascatti/sse/{uuid}")
 	public SseEmitter tableSse(@PathVariable String uuid) {
 		return pingpongService.newTableSse(uuid);
 	}
