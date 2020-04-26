@@ -17,3 +17,9 @@ export class RegisterPlayerDto extends MessageDto {
     code = RegisterPlayerDto.CODE;
     player: PlayerDto;
 }
+
+export class StalePlayersDto extends MessageDto {
+    static CODE = 'stale-players';
+    code = StalePlayersDto.CODE;
+    players: PlayerDto[];
+}

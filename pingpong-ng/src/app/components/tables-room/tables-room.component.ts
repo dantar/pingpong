@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { SharedDataService } from 'src/app/services/shared-data.service';
 import { PlayerDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
-import { MessageDto as SseDto, RegisterPlayerDto } from 'src/app/models/operations-dto.model';
+import { MessageDto as SseDto, RegisterPlayerDto, StalePlayersDto } from 'src/app/models/operations-dto.model';
 
 @Component({
   selector: 'app-tables-room',
@@ -45,18 +45,25 @@ export class TablesRoomComponent implements OnInit {
   }
 
   onSseEvent(dto: SseDto) {
+    console.log('event ' + dto.code, dto);
     switch (dto.code) {
       case RegisterPlayerDto.CODE:
         this.onSseRegisterPlayer(dto as RegisterPlayerDto);
+        break;
+      case StalePlayersDto.CODE:
+        this.onSseStlePlayers(dto as StalePlayersDto);
         break;
       default:
         console.log('cannot handle event', dto);
         break;
     }
   }
+  onSseStlePlayers(dto: StalePlayersDto) {
+    const stale = dto.players.map(p=>p.uuid);
+    this.players = this.players.filter(p=>!stale.includes(p.uuid));
+  }
 
   onSseRegisterPlayer(dto: RegisterPlayerDto) {
-    console.log('register-player', dto);
     this.players.push(dto.player);
   }
 
