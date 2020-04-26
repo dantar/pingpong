@@ -1,4 +1,20 @@
 <div *ngIf="players">
     <h1>Giocatori</h1>
-    <div *ngFor="let player of players">-{{player.name}}</div>
+    <div *ngFor="let player of players">
+        {{player.name}}
+        <span *ngIf="tables && shared.player.uuid != player.uuid" (click)="createTableWithPlayer(player)">invitalo ad un nuovo tavolo!</span>
+    </div>
 </div>
+
+<div *ngIf="tables">
+    <h1>Tavoli</h1>
+    <div *ngFor="let table of tables">
+        <div>Tavolo {{table.uuid}}</div>
+        <div (click)="goToTable(table)">Inizia!</div>
+        <ul>
+            <li *ngFor="let seat of table.seats">{{seat.open}} {{seat.pending}} {{seat.player && seat.player.name}}</li>
+        </ul>
+    </div>
+</div>
+
+<div *ngIf="tables" (click)="createTable()">Nuovo tavolo</div>

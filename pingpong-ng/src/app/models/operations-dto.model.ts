@@ -1,4 +1,4 @@
-import { PlayerDto } from './player.model';
+import { PlayerDto, TableDto } from './player.model';
 
 export class OpResult {
 
@@ -22,4 +22,10 @@ export class StalePlayersDto extends MessageDto {
     static CODE = 'stale-players';
     code = StalePlayersDto.CODE;
     players: PlayerDto[];
+}
+
+export class AvailableTableDto extends MessageDto {
+    static CODE = 'available-table';
+    code = AvailableTableDto.CODE;
+    table: TableDto;
 }

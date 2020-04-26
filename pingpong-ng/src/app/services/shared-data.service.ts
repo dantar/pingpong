@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PlayerDto } from '../models/player.model';
+import { PlayerDto, TableDto } from '../models/player.model';
 
 @Injectable({
   providedIn: 'root'
@@ -7,6 +7,8 @@ import { PlayerDto } from '../models/player.model';
 export class SharedDataService {
 
   player: PlayerDto;
+
+  table: TableDto;
 
   constructor() { }
 

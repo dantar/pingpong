@@ -1,0 +1,11 @@
+<div *ngIf="players">
+    <h1>Giocatori</h1>
+    <div *ngFor="let player of players">
+        {{player.name}}
+        ready: {{ready.includes(player.uuid)}}
+    </div>
+</div>
+<div *ngIf="sse">
+    <div *ngIf="!ready.includes(shared.player.uuid)">Ready!</div>
+</div>
+

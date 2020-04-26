@@ -18,8 +18,13 @@ public class SseController {
     PingpongService pingpongService;
     
 	@GetMapping("/sse/{uuid}")
-	public SseEmitter handleSse(@PathVariable String uuid) {
+	public SseEmitter playerSse(@PathVariable String uuid) {
 		return pingpongService.newPlayerSse(uuid);
+	}
+
+	@GetMapping("/table/sse/{uuid}")
+	public SseEmitter tableSse(@PathVariable String uuid) {
+		return pingpongService.newTableSse(uuid);
 	}
 
 }

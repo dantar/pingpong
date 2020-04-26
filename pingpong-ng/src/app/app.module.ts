@@ -7,13 +7,15 @@ import { AppComponent } from './app.component';
 import { TablesRoomComponent } from './components/tables-room/tables-room.component';
 import { HttpClientModule } from '@angular/common/http';
 import { RegisterPlayerComponent } from './components/register-player/register-player.component';
+import { GameRoomComponent } from './components/game-room/game-room.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     TablesRoomComponent,
-    RegisterPlayerComponent
+    RegisterPlayerComponent,
+    GameRoomComponent
   ],
   imports: [
     BrowserModule,
