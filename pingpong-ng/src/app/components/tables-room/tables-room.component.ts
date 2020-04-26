@@ -40,14 +40,9 @@ export class TablesRoomComponent implements OnInit {
 
   initSse() {
     this.sse = new EventSource(environment.server + '/sse/' + this.shared.player.uuid);
-    const component = this;
-    this.sse.onopen = function (evt) {
-        console.log('open', evt);
-    };
-    this.sse.onmessage = function (event: MessageEvent) {
-      console.log('message', event);
-      component.onSseEvent(JSON.parse(event.data) as SseDto);
-    };    
+    this.sse.addEventListener('message', message => {
+      this.onSseEvent(JSON.parse(message.data) as SseDto);
+    })
   }
 
   initPlayers() {

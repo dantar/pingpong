@@ -32,20 +32,17 @@ export class GameRoomComponent implements OnInit {
     this.initSse(this.activatedRoute.snapshot.params['uuid']);
     this.rest.table(this.activatedRoute.snapshot.params['uuid']).subscribe(table => {
       this.table = table;
-      this.players = table.seats.map(s=>s.player);
+      this.players = [];
+      this.players.push(table.owner);
+      this.players.push(...table.seats.map(s=>s.player)); // array spread operator!
     });
   }
 
   initSse(uuid: string) {
     this.sse = new EventSource(environment.server + '/table/sse/' + uuid);
-    const component = this;
-    this.sse.onopen = function (evt) {
-        console.log('open', evt);
-    };
-    this.sse.onmessage = function (event: MessageEvent) {
-      console.log('message', event);
-      component.onSseEvent(JSON.parse(event.data) as MessageDto);
-    };    
+    this.sse.addEventListener('message', message => {
+      this.onSseEvent(JSON.parse(message.data) as MessageDto);
+    })
   }
 
   onSseEvent(dto: FantascattiSseDto) {
