@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import it.dantar.games.pingpong.dto.AvailableTableSseDto;
 import it.dantar.games.pingpong.dto.PlayerDto;
@@ -16,11 +17,16 @@ import it.dantar.games.pingpong.dto.SseDto;
 import it.dantar.games.pingpong.dto.TableDto;
 
 @RestController
-public class GameController {
+public class TablesController {
 
 	@Autowired
-	PingpongService pingpongService;
-	
+	TablesService pingpongService;
+
+	@GetMapping("/sse/{uuid}")
+	public SseEmitter playerSse(@PathVariable String uuid) {
+		return pingpongService.newPlayerSse(uuid);
+	}
+
 	@GetMapping("/hello")
 	public void joinGame() {
 		pingpongService.broadcastMessage(new SseDto().setCode("hello"));

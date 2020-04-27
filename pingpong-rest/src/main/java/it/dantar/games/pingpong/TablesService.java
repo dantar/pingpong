@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -25,7 +26,7 @@ import it.dantar.games.pingpong.models.Player;
 import it.dantar.games.pingpong.models.Table;
 
 @Service
-public class PingpongService {
+public class TablesService {
 
 	// interesting async:
 	// private ExecutorService nonBlockingService = Executors.newCachedThreadPool();
@@ -37,6 +38,9 @@ public class PingpongService {
 	
 	static final long TIMEOUT = 1000*60*60*4L;
 	
+	@Autowired
+	FantascattiService fantascattiService;
+
 	public SseEmitter newPlayerSse(String uuid) {
 		return players.get(uuid)
 				.setEmitter(new SseEmitter(TIMEOUT))
@@ -89,6 +93,7 @@ public class PingpongService {
 
 	public void newTable(TableDto table) {
 		table.setUuid(UUID.randomUUID().toString());
+		fantascattiService.newGame(table);
 		this.tables.put(table.getUuid(), new Table().setDto(table));
 	}
 

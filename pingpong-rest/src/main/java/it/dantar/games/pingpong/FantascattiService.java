@@ -18,9 +18,11 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import it.dantar.games.pingpong.dto.DroppedStalePlayerSseDto;
 import it.dantar.games.pingpong.dto.FantascattiCardDto;
 import it.dantar.games.pingpong.dto.FantascattiNewGuessSseDto;
+import it.dantar.games.pingpong.dto.FantascattiPlayerPicksPieceSseDto;
 import it.dantar.games.pingpong.dto.FantascattiPlayerReadySseDto;
 import it.dantar.games.pingpong.dto.PlayerDto;
 import it.dantar.games.pingpong.dto.SseDto;
+import it.dantar.games.pingpong.dto.TableDto;
 import it.dantar.games.pingpong.models.FantascattiGame;
 import it.dantar.games.pingpong.models.FantascattiPiece;
 import it.dantar.games.pingpong.models.Player;
@@ -42,12 +44,27 @@ public class FantascattiService {
 	
 	static final long TIMEOUT = 1000*60*60*4L;
 	
+	public FantascattiGame newGame(TableDto table) {
+		FantascattiGame game = new FantascattiGame()
+				.setTableId(table.getUuid());
+		game.getPlayers().add(new Player().setDto(table.getOwner()));
+		table.getSeats().forEach(s -> {
+			game.getPlayers().add(new Player().setDto(s.getPlayer()));
+		});
+		this.games.put(game.getTableId(), game);
+		return game;
+	}
+	
 	public SseEmitter newPlayerSse(String gameId, String playerId) {
-		return this.games.get(gameId).getPlayers().stream()
-				.collect(Collectors.toMap(p->p.getDto().getUuid(), Function.identity()))
+		return gamePlayers(gameId)
 				.get(playerId)
 				.setEmitter(new SseEmitter(TIMEOUT))
 				.getEmitter();
+	}
+
+	private Map<String, Player> gamePlayers(String gameId) {
+		return this.games.get(gameId).getPlayers().stream()
+				.collect(Collectors.toMap(p->p.getDto().getUuid(), Function.identity()));
 	}
 
 	public void playerReady(String gameId, PlayerDto player) {
@@ -59,7 +76,7 @@ public class FantascattiService {
 			game.setGuess(randomGuess());
 			message = new FantascattiNewGuessSseDto().setGuess(game.getGuess());
 		} else {
-			message = new FantascattiPlayerReadySseDto();
+			message = new FantascattiPlayerReadySseDto().setPlayer(player);
 		}
 		this.broadcastMessageToPlayers(gameId, message);			
 	}
@@ -108,6 +125,14 @@ public class FantascattiService {
 								.collect(Collectors.toList())));
 			});
 		}
+	}
+
+	public Boolean playerPicksPiece(String gameId, String playerId, FantascattiPiece piece) {
+		this.broadcastMessageToPlayers(gameId, new FantascattiPlayerPicksPieceSseDto()
+				.setPlayer(gamePlayers(gameId).get(playerId).getDto())
+				.setPiece(piece)
+				);
+		return true;
 	}
 	
 }

@@ -2,10 +2,20 @@
     <h1>Giocatori</h1>
     <div *ngFor="let player of players">
         {{player.name}}
+        {{score[player.uuid]}}
         ready: {{ready.includes(player.uuid)}}
     </div>
 </div>
 <div *ngIf="sse">
     <div *ngIf="!ready.includes(shared.player.uuid)" (click)="iAmReady()">Ready!</div>
+</div>
+<div *ngIf="guess">
+    <div>
+        {{guess.shape1}}
+        {{guess.shape2}}
+        {{guess.color1}}
+        {{guess.color2}}
+    </div>
+    <div *ngFor="let piece of pieces" (click)="pick(piece)">{{piece.color}} {{piece.shape}}</div>
 </div>
 
