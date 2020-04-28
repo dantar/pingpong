@@ -11,11 +11,12 @@
 </div>
 <div *ngIf="guess">
     <div>
+        ( {{guess.correct }} ):
         {{guess.shape1}}
         {{guess.shape2}}
         {{guess.color1}}
         {{guess.color2}}
     </div>
-    <div *ngFor="let piece of pieces" (click)="pick(piece)">{{piece.color}} {{piece.shape}}</div>
+    <div *ngFor="let piece of pieces" class="selected-piece-{{piece === mypick}}" (click)="pick(piece)">{{piece.color}} {{piece.shape}}</div>
 </div>
 

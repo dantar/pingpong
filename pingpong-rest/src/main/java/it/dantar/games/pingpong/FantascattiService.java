@@ -39,7 +39,7 @@ public class FantascattiService {
 			new FantascattiPiece().setColor("green").setShape("shield"),
 			new FantascattiPiece().setColor("red").setShape("dragon"),
 			new FantascattiPiece().setColor("yellow").setShape("gold"),
-			new FantascattiPiece().setColor("black").setShape("chest")
+			new FantascattiPiece().setColor("brown").setShape("chest")
 	};
 	
 	static final long TIMEOUT = 1000*60*60*4L;
@@ -72,9 +72,7 @@ public class FantascattiService {
 		game.getReady().add(player.getUuid());
 		this.broadcastMessageToPlayers(gameId, new FantascattiPlayerReadySseDto().setPlayer(player));			
 		if (game.getReady().size() >= game.getPlayers().size()) {
-			game.getReady().clear();
-			game.setGuess(randomGuess());
-			this.broadcastMessageToPlayers(gameId, new FantascattiNewGuessSseDto().setGuess(game.getGuess()));			
+			this.nextTurn(gameId);
 		}
 	}
 
@@ -114,6 +112,13 @@ public class FantascattiService {
 		});
 		if (stale.size() > 0) {
 			stale.forEach(player -> {
+				FantascattiGame game = this.games.get(gameId);
+				if (game.getReady().contains(player.getDto().getUuid())) {
+					game.getReady().remove(player.getDto().getUuid());
+				}
+				if (game.getPicks().contains(player.getDto().getUuid())) {
+					game.getPicks().remove(player.getDto().getUuid());
+				}
 				broadcastMessageToPlayers(gameId, 
 						new DroppedStalePlayerSseDto().setPlayers(
 								stale
@@ -129,7 +134,20 @@ public class FantascattiService {
 				.setPlayer(gamePlayers(gameId).get(playerId).getDto())
 				.setPiece(piece)
 				);
+		FantascattiGame game = this.games.get(gameId);
+		game.getPicks().add(playerId);
+		if (game.getPicks().size() >= game.getPlayers().size()) {
+			this.nextTurn(gameId);
+		}
 		return true;
+	}
+
+	private void nextTurn(String gameId) {
+		FantascattiGame game = this.games.get(gameId);
+		game.getPicks().clear();
+		game.getReady().clear();
+		game.setGuess(randomGuess());
+		this.broadcastMessageToPlayers(gameId, new FantascattiNewGuessSseDto().setGuess(game.getGuess()));			
 	}
 	
 }

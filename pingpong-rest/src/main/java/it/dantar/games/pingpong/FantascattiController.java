@@ -28,7 +28,7 @@ public class FantascattiController {
 		return player;
 	}
 
-	@PostMapping("/fantascatti/{gameId}/{playerId}}/pick")
+	@PostMapping("/fantascatti/{gameId}/{playerId}/pick")
 	public FantascattiPiece pickPiece(@PathVariable String gameId, @PathVariable String playerId, @RequestBody FantascattiPiece piece) {
 		fantascattiService.playerPicksPiece(gameId, playerId, piece);
 		return piece;

@@ -21,7 +21,7 @@ export class PlayerPicksPieceDto extends FantascattiSseDto {
 }
 
 export class FantascattiCardDto {
-    correctShape: string;
+    correct: string;
     shape1: string;
     shape2: string;
     color1: string;

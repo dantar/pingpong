@@ -31,6 +31,7 @@ export class GameRoomComponent implements OnInit {
   players: PlayerDto[];
   ready: string[];
   score: {[id: string]: number};
+  mypick: FantascattiPiece;
 
   pieces: FantascattiPiece[];
 
@@ -42,6 +43,7 @@ export class GameRoomComponent implements OnInit {
       {shape: 'gold', color: 'yellow'},
       {shape: 'shield', color: 'green'},
     ];
+    this.mypick = null;
     this.ready = [];
     this.score = {};
     this.initSse(this.activatedRoute.snapshot.params['uuid']);
@@ -84,10 +86,11 @@ export class GameRoomComponent implements OnInit {
     }
   }
   onPlayerPicksPiece(dto: PlayerPicksPieceDto) {
-    if (dto.piece.shape === this.guess.correctShape) {
+    if (dto.piece.shape === this.guess.correct) {
       this.score[dto.player.uuid] += 1;
+      this.ready = [];
+      this.mypick = null;
     }
-    this.ready = [];
   }
   onNewGuess(dto: NewGuessDto) {
     this.guess = dto.guess;
@@ -105,9 +108,12 @@ export class GameRoomComponent implements OnInit {
   }
 
   pick(piece: FantascattiPiece) {
-    this.fantascatti.pickPiece(this.table, this.shared.player, piece).subscribe(r => {
-      // loading?
-    });
+    if (this.mypick === null) {
+      this.mypick = piece;
+      this.fantascatti.pickPiece(this.table, this.shared.player, piece).subscribe(r => {
+        // loading?
+      });
+    }
   }
 
 }

@@ -13,6 +13,7 @@ public class FantascattiGame {
 
 	List<Player> players = new ArrayList<>();
 	Set<String> ready = new HashSet<>();
+	Set<String> picks = new HashSet<>();
 	FantascattiCardDto guess;
 	Map<String, Integer> score = new HashMap<>();
 	String tableId;
@@ -51,6 +52,12 @@ public class FantascattiGame {
 	public FantascattiGame setTableId(String tableId) {
 		this.tableId = tableId;
 		return this;
+	}
+	public Set<String> getPicks() {
+		return picks;
+	}
+	public void setPicks(Set<String> picks) {
+		this.picks = picks;
 	}
 	
 }
