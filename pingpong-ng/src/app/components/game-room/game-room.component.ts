@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TableDto, PlayerDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
 import { environment } from 'src/environments/environment';
@@ -21,6 +21,7 @@ export class GameRoomComponent implements OnInit {
     private changes: ChangeDetectorRef,
     public shared: SharedDataService,
     private fantascatti: FantascattiService,
+    private router: Router,
   ) { }
 
   table: TableDto;
@@ -59,6 +60,9 @@ export class GameRoomComponent implements OnInit {
     this.sse = new EventSource(environment.server + '/fantascatti/sse/' + uuid + '/' + this.shared.player.uuid);
     this.sse.addEventListener('message', message => {
       this.onSseEvent(JSON.parse(message.data) as MessageDto);
+    })
+    this.sse.addEventListener('error', message => {
+      this.router.navigate(['']);
     })
   }
 

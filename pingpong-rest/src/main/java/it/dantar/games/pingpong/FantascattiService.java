@@ -69,16 +69,13 @@ public class FantascattiService {
 
 	public void playerReady(String gameId, PlayerDto player) {
 		FantascattiGame game = this.games.get(gameId);
-		SseDto message;
 		game.getReady().add(player.getUuid());
+		this.broadcastMessageToPlayers(gameId, new FantascattiPlayerReadySseDto().setPlayer(player));			
 		if (game.getReady().size() >= game.getPlayers().size()) {
 			game.getReady().clear();
 			game.setGuess(randomGuess());
-			message = new FantascattiNewGuessSseDto().setGuess(game.getGuess());
-		} else {
-			message = new FantascattiPlayerReadySseDto().setPlayer(player);
+			this.broadcastMessageToPlayers(gameId, new FantascattiNewGuessSseDto().setGuess(game.getGuess()));			
 		}
-		this.broadcastMessageToPlayers(gameId, message);			
 	}
 
 	private FantascattiCardDto randomGuess() {
