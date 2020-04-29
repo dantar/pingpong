@@ -1,3 +1,7 @@
+<div *ngIf="!connected">
+    Server non raggiungibile! <span (click)="initSse()">Connetti!</span>
+</div>
+
 <div *ngIf="players">
     <h1>Giocatori</h1>
     <div *ngFor="let player of players">

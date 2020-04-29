@@ -24,6 +24,8 @@ export class TablesRoomComponent implements OnInit {
   players: PlayerDto[];
   tables: TableDto[];
 
+  connected: boolean;
+
   ngOnInit(): void {
     this.players = null;
     this.tables = null;
@@ -39,9 +41,19 @@ export class TablesRoomComponent implements OnInit {
   }
 
   initSse() {
+    this.connected = false;
     this.sse = new EventSource(environment.server + '/sse/' + this.shared.player.uuid);
     this.sse.addEventListener('message', message => {
       this.onSseEvent(JSON.parse(message.data) as SseDto);
+    })
+    this.sse.addEventListener('error', error => {
+      console.log(error);
+      this.connected = false;
+      this.sse.close();
+    })
+    this.sse.addEventListener('open', open => {
+      console.log(open);
+      this.connected = true;
     })
   }
 
