@@ -15,8 +15,9 @@ public class PlayerDto {
 	public String getUuid() {
 		return uuid;
 	}
-	public void setUuid(String uuid) {
+	public PlayerDto setUuid(String uuid) {
 		this.uuid = uuid;
+		return this;
 	}
 	
 }

@@ -1,5 +1,5 @@
 <div *ngIf="!connected">
-    Server non raggiungibile! <span (click)="initSse()">Connetti!</span>
+    Server non raggiungibile! <span (click)="reconnect()">Connetti!</span>
 </div>
 
 <div *ngIf="players">

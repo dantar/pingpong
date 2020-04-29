@@ -57,6 +57,13 @@ export class TablesRoomComponent implements OnInit {
     })
   }
 
+  reconnect() {
+    this.rest.register(this.shared.player).subscribe(result => {
+      this.shared.player = result;
+      this.initSse();
+    });
+  }
+
   initPlayers() {
     this.rest.players().subscribe(players=> {
       this.players = players;

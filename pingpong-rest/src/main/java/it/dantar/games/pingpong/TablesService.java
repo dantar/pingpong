@@ -42,7 +42,12 @@ public class TablesService {
 	FantascattiService fantascattiService;
 
 	public SseEmitter newPlayerSse(String uuid) {
-		return players.get(uuid)
+		Player player = players.get(uuid);
+		if (player == null) {
+			player = new Player().setDto(new PlayerDto().setUuid(uuid));
+			this.players.put(uuid, player);
+		}
+		return player
 				.setEmitter(new SseEmitter(TIMEOUT))
 				.getEmitter();
 	}
@@ -87,8 +92,17 @@ public class TablesService {
 	}
 
 	public void register(PlayerDto dto) {
-		dto.setUuid(UUID.randomUUID().toString());
-		this.players.put(dto.getUuid(), new Player().setDto(dto));
+		Player player;
+		if (dto.getUuid() == null || dto.getUuid().isEmpty()) {
+			player = new Player().setDto(dto
+					.setUuid(UUID.randomUUID().toString()));
+			this.players.put(player.getDto().getUuid(), player);			
+		} else {
+			player = this.players.get(dto.getUuid());
+			if (player == null) {
+				this.players.put(dto.getUuid(), new Player().setDto(dto));
+			}
+		}
 	}
 
 	public void newTable(TableDto table) {
