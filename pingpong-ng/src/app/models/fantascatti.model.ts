@@ -3,6 +3,11 @@ import { PlayerDto } from './player.model';
 export class FantascattiSseDto {
     code: string;
 }
+export class NewPlayerDto extends FantascattiSseDto {
+    static CODE = 'new-player';
+    code = NewPlayerDto.CODE;
+    player: PlayerDto;
+}
 export class PlayerReadyDto extends FantascattiSseDto {
     static CODE = 'player-ready';
     code = PlayerReadyDto.CODE;
@@ -18,6 +23,7 @@ export class PlayerPicksPieceDto extends FantascattiSseDto {
     code = PlayerPicksPieceDto.CODE;
     piece: FantascattiPiece;
     player: PlayerDto;
+    score: {[id: string]: number};
 }
 
 export class FantascattiCardDto {

@@ -4,7 +4,7 @@ import { TableDto, PlayerDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
 import { environment } from 'src/environments/environment';
 import { MessageDto } from 'src/app/models/operations-dto.model';
-import { FantascattiSseDto, PlayerReadyDto, NewGuessDto, FantascattiCardDto, FantascattiPiece, PlayerPicksPieceDto } from 'src/app/models/fantascatti.model';
+import { FantascattiSseDto, NewPlayerDto, PlayerReadyDto, NewGuessDto, FantascattiCardDto, FantascattiPiece, PlayerPicksPieceDto } from 'src/app/models/fantascatti.model';
 import { SharedDataService } from 'src/app/services/shared-data.service';
 import { FantascattiService } from 'src/app/services/fantascatti.service';
 
@@ -32,6 +32,9 @@ export class GameRoomComponent implements OnInit {
   ready: string[];
   score: {[id: string]: number};
   mypick: FantascattiPiece;
+  moves: PlayerPicksPieceDto[];
+
+  state: 'wait-for-players' | 'wait-for-ready' | 'wait-for-guess' | 'wait-for-picks';
 
   pieces: FantascattiPiece[];
 
@@ -43,13 +46,13 @@ export class GameRoomComponent implements OnInit {
       {shape: 'gold', color: 'yellow'},
       {shape: 'shield', color: 'green'},
     ];
-    this.mypick = null;
-    this.ready = [];
     this.score = {};
+    this.moves = [];
+    this.players = [];    
+    this.resetTurn();
     this.initSse(this.activatedRoute.snapshot.params['uuid']);
     this.rest.table(this.activatedRoute.snapshot.params['uuid']).subscribe(table => {
       this.table = table;
-      this.players = [];
       this.players.push(table.owner);
       this.players.push(...table.seats.map(s=>s.player)); // array spread operator!
       this.players.forEach(p => {
@@ -71,6 +74,9 @@ export class GameRoomComponent implements OnInit {
   onSseEvent(dto: FantascattiSseDto) {
     console.log('event ' + dto.code, dto);
     switch (dto.code) {
+      case NewPlayerDto.CODE:
+        this.onSseNewPlayerDto(dto as NewPlayerDto);
+        break;
       case PlayerReadyDto.CODE:
         this.onSsePlayerReady(dto as PlayerReadyDto);
         break;
@@ -85,23 +91,41 @@ export class GameRoomComponent implements OnInit {
         break;
     }
   }
+  onSseNewPlayerDto(dto: NewPlayerDto) {
+    this.players.push(dto.player);
+  }
   onPlayerPicksPiece(dto: PlayerPicksPieceDto) {
-    if (dto.piece.shape === this.guess.correct) {
-      this.score[dto.player.uuid] += 1;
-      this.ready = [];
-      this.mypick = null;
+    this.moves.push(dto);
+    if (dto.score) {
+      this.score = dto.score;
+      this.resetTurn();
+    } else if (this.moves.length >= this.players.length) {
+      this.resetTurn();
     }
   }
   onNewGuess(dto: NewGuessDto) {
+    this.moves = [];
     this.guess = dto.guess;
+    this.state = 'wait-for-picks';
     this.changes.detectChanges();
   }
   onSsePlayerReady(dto: PlayerReadyDto) {
     this.ready.push(dto.player.uuid);
+    if (this.ready.length >= this.players.length) {
+      this.state = 'wait-for-guess';
+    }
     this.changes.detectChanges();
   }
 
+  resetTurn() {
+    this.state = 'wait-for-ready';
+    this.ready = [];
+    this.mypick = null;
+}
+
   iAmReady() {
+    this.moves = [];
+    this.guess = null;
     this.fantascatti.playerReady(this.table, this.shared.player).subscribe(
       // loading? 
     );

@@ -1,5 +1,7 @@
 package it.dantar.games.pingpong.dto;
 
+import java.util.Map;
+
 import it.dantar.games.pingpong.models.FantascattiPiece;
 
 public class FantascattiPlayerPicksPieceSseDto extends SseDto {
@@ -11,6 +13,7 @@ public class FantascattiPlayerPicksPieceSseDto extends SseDto {
 
 	PlayerDto player;
 	FantascattiPiece piece;
+	Map<String, Integer> score;
 
 	public PlayerDto getPlayer() {
 		return player;
@@ -24,6 +27,13 @@ public class FantascattiPlayerPicksPieceSseDto extends SseDto {
 	}
 	public FantascattiPlayerPicksPieceSseDto setPiece(FantascattiPiece piece) {
 		this.piece = piece;
+		return this;
+	}
+	public Map<String, Integer> getScore() {
+		return score;
+	}
+	public FantascattiPlayerPicksPieceSseDto setScore(Map<String, Integer> score) {
+		this.score = score;
 		return this;
 	}
 

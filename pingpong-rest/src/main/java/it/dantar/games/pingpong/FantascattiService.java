@@ -130,14 +130,20 @@ public class FantascattiService {
 	}
 
 	public Boolean playerPicksPiece(String gameId, String playerId, FantascattiPiece piece) {
+		FantascattiGame game = this.games.get(gameId);
+		boolean correct = piece.getShape().equals(game.getGuess().getCorrect());
+		if (correct) {
+			game.getScore().put(playerId, game.getScore().get(playerId) == null ? 1 : game.getScore().get(playerId) +1);
+		}
 		this.broadcastMessageToPlayers(gameId, new FantascattiPlayerPicksPieceSseDto()
 				.setPlayer(gamePlayers(gameId).get(playerId).getDto())
 				.setPiece(piece)
+				.setScore(correct ? game.getScore() : null)
 				);
-		FantascattiGame game = this.games.get(gameId);
 		game.getPicks().add(playerId);
 		if (game.getPicks().size() >= game.getPlayers().size()) {
-			this.nextTurn(gameId);
+			game.getPicks().clear();
+			game.getReady().clear();
 		}
 		return true;
 	}

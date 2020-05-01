@@ -6,17 +6,33 @@
         ready: {{ready.includes(player.uuid)}}
     </div>
 </div>
-<div *ngIf="sse">
-    <div *ngIf="!ready.includes(shared.player.uuid)" (click)="iAmReady()">Ready!</div>
-</div>
+
 <div *ngIf="guess">
-    <div>
-        ( {{guess.correct }} ):
-        {{guess.shape1}}
-        {{guess.shape2}}
-        {{guess.color1}}
-        {{guess.color2}}
+    ( {{guess.correct }} ):
+    {{guess.shape1}}
+    {{guess.shape2}}
+    {{guess.color1}}
+    {{guess.color2}}
+</div>
+
+<div *ngIf="moves">
+    <div *ngFor="let move of moves">
+        {{move.player.name}} ha scelto {{move.piece.shape}}
+        <span *ngIf="move.score">e ha vinto!</span>
     </div>
+</div>
+
+<div *ngIf="state === 'wait-for-picks'">
     <div *ngFor="let piece of pieces" class="selected-piece-{{piece === mypick}}" (click)="pick(piece)">{{piece.color}} {{piece.shape}}</div>
 </div>
 
+<div *ngIf="state === 'wait-for-ready'">
+    <div *ngIf="ready && players">
+        {{ready.length}} / {{players.length}}
+    </div>
+
+    <div *ngIf="!ready.includes(shared.player.uuid)" (click)="iAmReady()">Ready!</div>
+
+</div>
+
+<div>{{state}}</div>
