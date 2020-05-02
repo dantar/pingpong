@@ -126,8 +126,8 @@ public class TablesService {
 		return this.tables.entrySet().stream()
 				.map(entry -> entry.getValue().getDto())
 				.filter(t -> {
-					List<SeatDto> seats = t.getSeats();
-					for (SeatDto seatDto : seats) {
+					if (t.getOwner().getUuid().equals(playerId)) return true;
+					for (SeatDto seatDto : t.getSeats()) {
 						if (seatDto.getOpen()) return true;
 						if (seatDto.getPlayer() != null && seatDto.getPlayer().getUuid().equals(playerId)) return true; 
 					}
