@@ -104,9 +104,9 @@ public class TablesController {
 		return pingpongService.listPlayers();
 	}
 
-	@GetMapping("/tables")
-	public List<TableDto> getTables() {
-		return pingpongService.listTables();
+	@GetMapping("/tables/{playerId}")
+	public List<TableDto> getTables(@PathVariable String playerId) {
+		return pingpongService.listPlayerTables(playerId);
 	}
 
 }

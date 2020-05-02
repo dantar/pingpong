@@ -33,8 +33,8 @@ export class RestService {
     return this.http.get<PlayerDto[]>(environment.server + '/players');
   }
 
-  tables(): Observable<TableDto[]> {
-    return this.http.get<TableDto[]>(environment.server + '/tables');
+  tables(player: PlayerDto): Observable<TableDto[]> {
+    return this.http.get<TableDto[]>(environment.server + '/tables/' + player.uuid);
   }
 
   table(uuid: string): Observable<TableDto> {

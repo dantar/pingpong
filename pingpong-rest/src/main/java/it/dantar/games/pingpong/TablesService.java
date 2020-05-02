@@ -122,9 +122,17 @@ public class TablesService {
 				.collect(Collectors.toList());
 	}
 
-	public List<TableDto> listTables() {
+	public List<TableDto> listPlayerTables(String playerId) {
 		return this.tables.entrySet().stream()
 				.map(entry -> entry.getValue().getDto())
+				.filter(t -> {
+					List<SeatDto> seats = t.getSeats();
+					for (SeatDto seatDto : seats) {
+						if (seatDto.getOpen()) return true;
+						if (seatDto.getPlayer() != null && seatDto.getPlayer().getUuid().equals(playerId)) return true; 
+					}
+					return false;
+				})
 				.collect(Collectors.toList());
 	}
 

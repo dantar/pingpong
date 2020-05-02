@@ -36,7 +36,7 @@ export class TablesRoomComponent implements OnInit {
   }
   
   initTables() {
-    this.rest.tables().subscribe(tables => {
+    this.rest.tables(this.shared.player).subscribe(tables => {
       this.tables = tables;
       this.tablesmap = {};
       this.tables.forEach(t=> {
