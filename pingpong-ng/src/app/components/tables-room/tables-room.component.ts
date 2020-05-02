@@ -92,6 +92,7 @@ export class TablesRoomComponent implements OnInit {
     } else {
       this.tables.splice(index, 1, dto.table);
     }
+    this.tablesmap[dto.table.uuid] = dto.table;
     this.changes.detectChanges();
   }
   onSseTablePlayerAccept(dto: TablePlayerAcceptSseDto) {
@@ -101,6 +102,7 @@ export class TablesRoomComponent implements OnInit {
     } else {
       this.tables.splice(index, 1, dto.table);
     }
+    this.tablesmap[dto.table.uuid] = dto.table;
     this.changes.detectChanges();
   }
   onSseAvailableTable(dto: AvailableTableDto) {
@@ -122,9 +124,7 @@ export class TablesRoomComponent implements OnInit {
 
   createTable() {
     this.rest.newTable({seats: [], owner: this.shared.player}).subscribe(table => {
-      this.tables.push(table);
-      this.tablesmap[table.uuid] = table;
-      this.changes.detectChanges();
+      console.log(table);
     });
   }
 
