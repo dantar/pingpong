@@ -160,4 +160,9 @@ export class TablesRoomComponent implements OnInit {
     }
   }
 
+  tableAvailablePlayers(table: TableDto): PlayerDto[] {
+    const seats = table.seats.filter(s=>s.player!=null).map(s => s.player.uuid);
+    return this.players.filter(p => p.uuid != table.owner.uuid && !seats.includes(p.uuid));
+  }
+
 }

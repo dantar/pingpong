@@ -23,8 +23,8 @@
             </div>
         </div>
         <div *ngIf="shared.player.uuid === table.owner.uuid">Invite players
-            <div *ngFor="let player of players" (click)="includePlayer(table, player)">
-                {{player.name}}
+            <div *ngFor="let player of tableAvailablePlayers(table)">
+                <div (click)="includePlayer(table, player)">{{player.name}}</div>                 
             </div>
             <div (click)="goToTable(table)">Inizia!</div>
         </div>

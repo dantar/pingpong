@@ -136,7 +136,7 @@ public class TablesService {
 			Stream<Player> seats = this.tables.get(table.getUuid()).getDto()
 					.getSeats()
 					.stream()
-					.filter(s->s.getPending() && s.getPlayer()!=null)
+					.filter(s -> s.getPlayer()!=null)
 					.map(s->this.players.get(s.getPlayer().getUuid()));
 			this.broadcastMessageToPlayers(message, Stream.concat(
 					seats, 
