@@ -29,5 +29,9 @@ public class TableDto {
 		this.seats = seats;
 		return this;
 	}
+	public TableDto addSeat(SeatDto seat) {
+		this.getSeats().add(seat);
+		return this;
+	}
 	
 }

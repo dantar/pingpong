@@ -7,7 +7,8 @@ import { GameRoomComponent } from './components/game-room/game-room.component';
 
 
 const routes: Routes = [
-  {path: '', component: RegisterPlayerComponent},
+  {path: '', component: TablesRoomComponent, canActivate: [LoggedGuardService]},
+  {path: 'register', component: RegisterPlayerComponent},
   {path: 'tables', component: TablesRoomComponent, canActivate: [LoggedGuardService]},
   {path: 'table/:uuid', component: GameRoomComponent, canActivate: [LoggedGuardService]},
 ];

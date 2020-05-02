@@ -9,20 +9,23 @@ public class SeatDto {
 	public PlayerDto getPlayer() {
 		return player;
 	}
-	public void setPlayer(PlayerDto player) {
+	public SeatDto setPlayer(PlayerDto player) {
 		this.player = player;
+		return this;
 	}
 	public Boolean getPending() {
 		return pending;
 	}
-	public void setPending(Boolean pending) {
+	public SeatDto setPending(Boolean pending) {
 		this.pending = pending;
+		return this;
 	}
 	public Boolean getOpen() {
 		return open;
 	}
-	public void setOpen(Boolean open) {
+	public SeatDto setOpen(Boolean open) {
 		this.open = open;
+		return this;
 	}
 
 }

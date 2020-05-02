@@ -1,9 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SharedDataService } from 'src/app/services/shared-data.service';
-import { PlayerDto, TableDto } from 'src/app/models/player.model';
+import { PlayerDto, TableDto, SeatDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
-import { MessageDto as SseDto, RegisterPlayerDto, StalePlayersDto, AvailableTableDto } from 'src/app/models/operations-dto.model';
+import { MessageDto as SseDto, RegisterPlayerDto, StalePlayersDto, AvailableTableDto,
+  TablePlayerAcceptSseDto, TablePlayerInvitationSseDto } from 'src/app/models/operations-dto.model';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 
@@ -20,9 +21,9 @@ export class TablesRoomComponent implements OnInit {
     private changes: ChangeDetectorRef,
     private router: Router) { }
 
-  sse: EventSource;
   players: PlayerDto[];
   tables: TableDto[];
+  tablesmap: {[id:string]: TableDto};
 
   connected: boolean;
 
@@ -37,31 +38,22 @@ export class TablesRoomComponent implements OnInit {
   initTables() {
     this.rest.tables().subscribe(tables => {
       this.tables = tables;
+      this.tablesmap = {};
+      this.tables.forEach(t=> {
+        this.tablesmap[t.uuid] = t;
+      });
     });
+  }
+
+  dropTable(table: TableDto) {
+    console.log(table);
   }
 
   initSse() {
     this.connected = false;
-    this.sse = new EventSource(environment.server + '/sse/' + this.shared.player.uuid);
-    this.sse.addEventListener('message', message => {
+    this.shared.sse.addEventListener('message', message => {
       this.onSseEvent(JSON.parse(message.data) as SseDto);
     })
-    this.sse.addEventListener('error', error => {
-      console.log(error);
-      this.connected = false;
-      this.sse.close();
-    })
-    this.sse.addEventListener('open', open => {
-      console.log(open);
-      this.connected = true;
-    })
-  }
-
-  reconnect() {
-    this.rest.register(this.shared.player).subscribe(result => {
-      this.shared.player = result;
-      this.initSse();
-    });
   }
 
   initPlayers() {
@@ -82,13 +74,38 @@ export class TablesRoomComponent implements OnInit {
       case AvailableTableDto.CODE:
         this.onSseAvailableTable(dto as AvailableTableDto);
         break;
+      case TablePlayerInvitationSseDto.CODE:
+        this.onSseTablePlayerInvitation(dto as TablePlayerInvitationSseDto);
+        break;
+      case TablePlayerAcceptSseDto.CODE:
+        this.onSseTablePlayerAccept(dto as TablePlayerAcceptSseDto);
+        break;
       default:
         console.log('cannot handle event', dto);
         break;
     }
   }
+  onSseTablePlayerInvitation(dto: TablePlayerInvitationSseDto) {
+    const index = this.tables.indexOf(this.tablesmap[dto.table.uuid]);
+    if (index === -1) {
+      this.tables.push(dto.table);
+    } else {
+      this.tables.splice(index, 1, dto.table);
+    }
+    this.changes.detectChanges();
+  }
+  onSseTablePlayerAccept(dto: TablePlayerAcceptSseDto) {
+    const index = this.tables.indexOf(this.tablesmap[dto.table.uuid]);
+    if (index === -1) {
+      this.tables.push(dto.table);
+    } else {
+      this.tables.splice(index, 1, dto.table);
+    }
+    this.changes.detectChanges();
+  }
   onSseAvailableTable(dto: AvailableTableDto) {
     this.tables.push(dto.table);
+    this.tablesmap[dto.table.uuid] = dto.table;
     this.changes.detectChanges();
   }
   onSseStalePlayers(dto: StalePlayersDto) {
@@ -106,6 +123,7 @@ export class TablesRoomComponent implements OnInit {
   createTable() {
     this.rest.newTable({seats: [], owner: this.shared.player}).subscribe(table => {
       this.tables.push(table);
+      this.tablesmap[table.uuid] = table;
       this.changes.detectChanges();
     });
   }
@@ -117,12 +135,29 @@ export class TablesRoomComponent implements OnInit {
     }
     this.rest.newTable(table).subscribe(table => {
       this.tables.push(table);
+      this.tablesmap[table.uuid] = table;
       this.changes.detectChanges();
     });
   }
 
   goToTable(table: TableDto) {
     this.router.navigate(['table', table.uuid]);
+  }
+
+  includePlayer(table: TableDto, player: PlayerDto) {
+    this.rest.newTablePlayer(table, player).subscribe(table => {
+      console.log(table);
+      // something
+    });
+  }
+
+  acceptInvitation(table: TableDto, seat: SeatDto, accept: boolean) {
+    this.rest.acceptInvitation(table, seat, accept).subscribe(t => {
+      console.log(t);
+    });
+    if (! accept) {
+      this.tables.splice(this.tables.indexOf(table), 1);
+    }
   }
 
 }

@@ -15,7 +15,7 @@ export class LoggedGuardService {
     if (this.shared.player && this.shared.player.uuid) {
       return true;
     }
-    this.router.navigate(['']);
+    this.router.navigate(['register']);
     return false;
   }
 

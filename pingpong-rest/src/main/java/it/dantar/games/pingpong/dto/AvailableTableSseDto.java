@@ -8,7 +8,7 @@ public class AvailableTableSseDto extends SseDto {
 	}
 
 	TableDto table;
-
+	
 	public TableDto getTable() {
 		return table;
 	}

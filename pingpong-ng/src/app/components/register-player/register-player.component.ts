@@ -24,7 +24,8 @@ export class RegisterPlayerComponent implements OnInit {
 
   register() {
     this.rest.register(this.player).subscribe(result => {
-      this.shared.player = result;
+      this.shared.setPlayer(result);
+      this.shared.initSse();
       this.router.navigate(['tables']);
     });
   }

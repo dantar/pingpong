@@ -2,6 +2,7 @@ package it.dantar.games.pingpong;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -132,12 +133,20 @@ public class TablesService {
 		if (openSeats.size() > 0) {
 			this.broadcastMessage(message);
 		} else {
-			this.broadcastMessageToPlayers(message, this.tables.get(table.getUuid()).getDto()
+			Stream<Player> seats = this.tables.get(table.getUuid()).getDto()
 					.getSeats()
 					.stream()
 					.filter(s->s.getPending() && s.getPlayer()!=null)
-					.map(s->this.players.get(s.getPlayer().getUuid())) );;
+					.map(s->this.players.get(s.getPlayer().getUuid()));
+			this.broadcastMessageToPlayers(message, Stream.concat(
+					seats, 
+					Arrays.asList(this.players.get(table.getOwner().getUuid())).stream() 
+					));
 		}
+	}
+
+	public void broadcastMessageToPlayer(PlayerDto player, SseDto message) {
+		this.broadcastMessageToPlayers(message, Arrays.asList(this.players.get(player.getUuid())).stream());
 	}
 
 }

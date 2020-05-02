@@ -29,3 +29,16 @@ export class AvailableTableDto extends MessageDto {
     code = AvailableTableDto.CODE;
     table: TableDto;
 }
+export class TablePlayerInvitationSseDto extends MessageDto {
+    static CODE = 'table-invitation';
+    code = TablePlayerInvitationSseDto.CODE;
+    table: TableDto;
+    player: PlayerDto;
+}
+export class TablePlayerAcceptSseDto extends MessageDto {
+    static CODE = 'table-accept';
+    code = TablePlayerAcceptSseDto.CODE;
+    table: TableDto;
+    player: PlayerDto;
+    accept: boolean;
+}

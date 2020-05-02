@@ -1,9 +1,6 @@
-<div *ngIf="!connected">
-    Server non raggiungibile! <span (click)="reconnect()">Connetti!</span>
-</div>
 
 <div *ngIf="players">
-    <h1>Giocatori</h1>
+    <h1>Giocatori {{shared.player.name}}</h1>
     <div *ngFor="let player of players">
         {{player.name}}
         <span *ngIf="tables && shared.player.uuid != player.uuid" (click)="createTableWithPlayer(player)">invitalo ad un nuovo tavolo!</span>
@@ -14,10 +11,23 @@
     <h1>Tavoli</h1>
     <div *ngFor="let table of tables">
         <div>Tavolo {{table.uuid}}</div>
-        <div (click)="goToTable(table)">Inizia!</div>
-        <ul>
-            <li *ngFor="let seat of table.seats">{{seat.open}} {{seat.pending}} {{seat.player && seat.player.name}}</li>
-        </ul>
+        <div *ngIf="table.owner.uuid === shared.player.uuid" (click)="dropTable(table)">drop table</div>
+        <div>Owner: {{table.owner.name}}</div>
+        <div>
+            <div *ngFor="let seat of table.seats">
+                {{seat.open}} {{seat.pending}} {{seat.player && seat.player.name}}
+                <div *ngIf="seat.pending && seat.player && seat.player.uuid === shared.player.uuid">
+                    <span (click)="acceptInvitation(table, seat, true)">accetta</span>
+                    <span (click)="acceptInvitation(table, seat, false)">rifiuta</span>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="shared.player.uuid === table.owner.uuid">Invite players
+            <div *ngFor="let player of players" (click)="includePlayer(table, player)">
+                {{player.name}}
+            </div>
+            <div (click)="goToTable(table)">Inizia!</div>
+        </div>
     </div>
 </div>
 

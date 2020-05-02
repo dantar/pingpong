@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PlayerDto, TableDto } from '../models/player.model';
+import { PlayerDto, TableDto, SeatDto } from '../models/player.model';
 import { Observable } from 'rxjs';
 import { OpResult } from '../models/operations-dto.model';
 import { environment } from 'src/environments/environment';
@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class RestService {
-  
+
   constructor(private http: HttpClient) { }
 
   register(player: PlayerDto): Observable<PlayerDto> {
@@ -20,6 +20,15 @@ export class RestService {
     return this.http.post<TableDto>(environment.server + '/table', table);
   }
 
+  newTablePlayer(table: TableDto, player: PlayerDto): Observable<TableDto> {
+    return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + '/invite', player);
+  }
+
+  acceptInvitation(table: TableDto, seat: SeatDto, accept: boolean) {
+    const action = accept ? '/accept' : '/reject';
+    return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + action, seat.player);
+  }
+  
   players(): Observable<PlayerDto[]> {
     return this.http.get<PlayerDto[]>(environment.server + '/players');
   }
