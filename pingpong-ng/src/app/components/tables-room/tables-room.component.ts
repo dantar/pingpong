@@ -4,7 +4,7 @@ import { SharedDataService } from 'src/app/services/shared-data.service';
 import { PlayerDto, TableDto, SeatDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
 import { MessageDto as SseDto, RegisterPlayerDto, StalePlayersDto, AvailableTableDto,
-  TablePlayerAcceptSseDto, TablePlayerInvitationSseDto } from 'src/app/models/operations-dto.model';
+  TablePlayerAcceptSseDto, TablePlayerInvitationSseDto, TableStartSseDto } from 'src/app/models/operations-dto.model';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 
@@ -80,10 +80,17 @@ export class TablesRoomComponent implements OnInit {
       case TablePlayerAcceptSseDto.CODE:
         this.onSseTablePlayerAccept(dto as TablePlayerAcceptSseDto);
         break;
+      case TableStartSseDto.CODE:
+        this.onSseTableStartSseDto(dto as TableStartSseDto);
+        break;
       default:
         console.log('cannot handle event', dto);
         break;
     }
+  }
+  onSseTableStartSseDto(dto: TableStartSseDto) {
+    this.router.navigate(['table', dto.table.uuid]);
+    this.changes.detectChanges();
   }
   onSseTablePlayerInvitation(dto: TablePlayerInvitationSseDto) {
     const index = this.tables.indexOf(this.tablesmap[dto.table.uuid]);
@@ -140,7 +147,10 @@ export class TablesRoomComponent implements OnInit {
     });
   }
 
-  goToTable(table: TableDto) {
+  startTable(table: TableDto) {
+    this.rest.startTable(table).subscribe(t => {
+      
+    });
     this.router.navigate(['table', table.uuid]);
   }
 
@@ -165,4 +175,7 @@ export class TablesRoomComponent implements OnInit {
     return this.players.filter(p => p.uuid != table.owner.uuid && !seats.includes(p.uuid));
   }
 
+  tableCanStart(table: TableDto) {
+    return table.seats.filter(s=>s.pending || s.open).length === 0;
+  }
 }

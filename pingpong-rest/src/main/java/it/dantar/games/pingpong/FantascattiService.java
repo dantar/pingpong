@@ -1,35 +1,29 @@
 package it.dantar.games.pingpong;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import it.dantar.games.pingpong.dto.DroppedStalePlayerSseDto;
 import it.dantar.games.pingpong.dto.FantascattiCardDto;
 import it.dantar.games.pingpong.dto.FantascattiNewGuessSseDto;
 import it.dantar.games.pingpong.dto.FantascattiPlayerPicksPieceSseDto;
 import it.dantar.games.pingpong.dto.FantascattiPlayerReadySseDto;
 import it.dantar.games.pingpong.dto.PlayerDto;
-import it.dantar.games.pingpong.dto.SseDto;
 import it.dantar.games.pingpong.dto.TableDto;
 import it.dantar.games.pingpong.models.FantascattiGame;
 import it.dantar.games.pingpong.models.FantascattiPiece;
-import it.dantar.games.pingpong.models.Player;
 
 @Service
 public class FantascattiService {
 
+	@Autowired
+	TablesService tablesService;
+	
 	Map<String, FantascattiGame> games = new HashMap<String, FantascattiGame>();
 	
 	static final float CHANCE_OF_TWIN = 0.25f;
@@ -47,31 +41,15 @@ public class FantascattiService {
 	public FantascattiGame newGame(TableDto table) {
 		FantascattiGame game = new FantascattiGame()
 				.setTableId(table.getUuid());
-		game.getPlayers().add(new Player().setDto(table.getOwner()));
-		table.getSeats().forEach(s -> {
-			game.getPlayers().add(new Player().setDto(s.getPlayer()));
-		});
 		this.games.put(game.getTableId(), game);
 		return game;
 	}
 	
-	public SseEmitter newPlayerSse(String gameId, String playerId) {
-		return gamePlayers(gameId)
-				.get(playerId)
-				.setEmitter(new SseEmitter(TIMEOUT))
-				.getEmitter();
-	}
-
-	private Map<String, Player> gamePlayers(String gameId) {
-		return this.games.get(gameId).getPlayers().stream()
-				.collect(Collectors.toMap(p->p.getDto().getUuid(), Function.identity()));
-	}
-
 	public void playerReady(String gameId, PlayerDto player) {
 		FantascattiGame game = this.games.get(gameId);
 		game.getReady().add(player.getUuid());
-		this.broadcastMessageToPlayers(gameId, new FantascattiPlayerReadySseDto().setPlayer(player));			
-		if (game.getReady().size() >= game.getPlayers().size()) {
+		this.tablesService.broadcastMessageToTable(gameId, new FantascattiPlayerReadySseDto().setPlayer(player));			
+		if (game.getReady().size() >= tablesService.getTable(gameId).getSeats().size()+1) {
 			this.nextTurn(gameId);
 		}
 	}
@@ -97,51 +75,19 @@ public class FantascattiService {
 		return result;
 	}
 
-	private void broadcastMessageToPlayers(String gameId, SseDto message) {
-		Set<Player> stale = new HashSet<>();
-		this.games.get(gameId).getPlayers().stream()
-		.filter(p->p.getEmitter()!=null)
-		.forEach(p -> {
-			try {
-				p.getEmitter().send(SseEmitter.event().data(message, MediaType.APPLICATION_JSON));
-			} catch (IOException e) {
-				p.getEmitter().completeWithError(e);
-				p.setEmitter(null);
-				stale.add(p);
-			}
-		});
-		if (stale.size() > 0) {
-			stale.forEach(player -> {
-				FantascattiGame game = this.games.get(gameId);
-				if (game.getReady().contains(player.getDto().getUuid())) {
-					game.getReady().remove(player.getDto().getUuid());
-				}
-				if (game.getPicks().contains(player.getDto().getUuid())) {
-					game.getPicks().remove(player.getDto().getUuid());
-				}
-				broadcastMessageToPlayers(gameId, 
-						new DroppedStalePlayerSseDto().setPlayers(
-								stale
-								.stream()
-								.map(p->p.getDto())
-								.collect(Collectors.toList())));
-			});
-		}
-	}
-
 	public Boolean playerPicksPiece(String gameId, String playerId, FantascattiPiece piece) {
 		FantascattiGame game = this.games.get(gameId);
 		boolean correct = piece.getShape().equals(game.getGuess().getCorrect());
 		if (correct) {
 			game.getScore().put(playerId, game.getScore().get(playerId) == null ? 1 : game.getScore().get(playerId) +1);
 		}
-		this.broadcastMessageToPlayers(gameId, new FantascattiPlayerPicksPieceSseDto()
-				.setPlayer(gamePlayers(gameId).get(playerId).getDto())
+		this.tablesService.broadcastMessageToTable(game.getTableId(), new FantascattiPlayerPicksPieceSseDto()
+				.setPlayer(tablesService.getPlayer(playerId))
 				.setPiece(piece)
 				.setScore(correct ? game.getScore() : null)
 				);
 		game.getPicks().add(playerId);
-		if (game.getPicks().size() >= game.getPlayers().size()) {
+		if (game.getPicks().size() >= this.tablesService.getTable(gameId).getSeats().size()+1) {
 			game.getPicks().clear();
 			game.getReady().clear();
 		}
@@ -153,7 +99,7 @@ public class FantascattiService {
 		game.getPicks().clear();
 		game.getReady().clear();
 		game.setGuess(randomGuess());
-		this.broadcastMessageToPlayers(gameId, new FantascattiNewGuessSseDto().setGuess(game.getGuess()));			
+		tablesService.broadcastMessageToTable(gameId, new FantascattiNewGuessSseDto().setGuess(game.getGuess()));			
 	}
 	
 }

@@ -20,6 +20,7 @@ import it.dantar.games.pingpong.dto.SseDto;
 import it.dantar.games.pingpong.dto.TableDto;
 import it.dantar.games.pingpong.dto.TablePlayerAcceptSseDto;
 import it.dantar.games.pingpong.dto.TablePlayerInvitationSseDto;
+import it.dantar.games.pingpong.dto.TableStartSseDto;
 
 @RestController
 public class TablesController {
@@ -107,6 +108,13 @@ public class TablesController {
 	@GetMapping("/tables/{playerId}")
 	public List<TableDto> getTables(@PathVariable String playerId) {
 		return pingpongService.listPlayerTables(playerId);
+	}
+
+	@PostMapping("/table/{tableId}/start")
+	public TableDto startTable(@PathVariable String tableId) {
+		TableDto table = pingpongService.getTable(tableId);
+		pingpongService.broadcastMessageToTable(table, new TableStartSseDto().setTable(table));
+		return table;
 	}
 
 }

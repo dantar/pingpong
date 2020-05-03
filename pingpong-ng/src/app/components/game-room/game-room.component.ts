@@ -25,7 +25,6 @@ export class GameRoomComponent implements OnInit {
   ) { }
 
   table: TableDto;
-  sse: EventSource;
   guess: FantascattiCardDto;
 
   players: PlayerDto[];
@@ -62,12 +61,8 @@ export class GameRoomComponent implements OnInit {
   }
 
   initSse(uuid: string) {
-    this.sse = new EventSource(environment.server + '/fantascatti/sse/' + uuid + '/' + this.shared.player.uuid);
-    this.sse.addEventListener('message', message => {
+    this.shared.sse.addEventListener('message', message => {
       this.onSseEvent(JSON.parse(message.data) as MessageDto);
-    })
-    this.sse.addEventListener('error', message => {
-      this.router.navigate(['']);
     })
   }
 

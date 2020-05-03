@@ -115,6 +115,10 @@ public class TablesService {
 	public TableDto getTable(String uuid) {
 		return this.tables.get(uuid).getDto();
 	}
+	
+	public PlayerDto getPlayer(String uuid) {
+		return this.players.get(uuid).getDto();
+	}
 
 	public List<PlayerDto> listPlayers() {
 		return this.players.entrySet().stream()
@@ -136,19 +140,25 @@ public class TablesService {
 				.collect(Collectors.toList());
 	}
 
-	public void broadcastMessageToTable(TableDto table, SseDto message) {
-		List<SeatDto> openSeats = this.tables.get(table.getUuid()).getDto().getSeats().stream().filter(s->s.getOpen()).collect(Collectors.toList());
+	public void broadcastMessageToTable(TableDto tableDto, SseDto message) {
+		String tableId = tableDto.getUuid();
+		broadcastMessageToTable(tableId, message);
+	}
+
+	public void broadcastMessageToTable(String tableId, SseDto message) {
+		Table table = this.tables.get(tableId);
+		List<SeatDto> openSeats = this.tables.get(tableId).getDto().getSeats().stream().filter(s->s.getOpen()).collect(Collectors.toList());
 		if (openSeats.size() > 0) {
 			this.broadcastMessage(message);
 		} else {
-			Stream<Player> seats = this.tables.get(table.getUuid()).getDto()
+			Stream<Player> seats = this.tables.get(tableId).getDto()
 					.getSeats()
 					.stream()
 					.filter(s -> s.getPlayer()!=null)
 					.map(s->this.players.get(s.getPlayer().getUuid()));
 			this.broadcastMessageToPlayers(message, Stream.concat(
 					seats, 
-					Arrays.asList(this.players.get(table.getOwner().getUuid())).stream() 
+					Arrays.asList(this.players.get(table.getDto().getOwner().getUuid())).stream() 
 					));
 		}
 	}

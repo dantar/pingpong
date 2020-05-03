@@ -42,3 +42,8 @@ export class TablePlayerAcceptSseDto extends MessageDto {
     player: PlayerDto;
     accept: boolean;
 }
+export class TableStartSseDto extends MessageDto {
+    static CODE = 'table-start';
+    code = TableStartSseDto.CODE;
+    table: TableDto;
+}

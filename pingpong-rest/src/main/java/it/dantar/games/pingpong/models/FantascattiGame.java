@@ -1,9 +1,7 @@
 package it.dantar.games.pingpong.models;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,20 +9,12 @@ import it.dantar.games.pingpong.dto.FantascattiCardDto;
 
 public class FantascattiGame {
 
-	List<Player> players = new ArrayList<>();
 	Set<String> ready = new HashSet<>();
 	Set<String> picks = new HashSet<>();
 	FantascattiCardDto guess;
 	Map<String, Integer> score = new HashMap<>();
 	String tableId;
 
-	public List<Player> getPlayers() {
-		return players;
-	}
-	public FantascattiGame setPlayers(List<Player> players) {
-		this.players = players;
-		return this;
-	}
 	public FantascattiCardDto getGuess() {
 		return guess;
 	}
