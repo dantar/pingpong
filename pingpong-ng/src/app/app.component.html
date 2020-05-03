@@ -1,15 +1,22 @@
-<div *ngIf="shared.player">Player</div>
-<div *ngIf="!shared.player">!Player</div>
+<div class="bg">
 
-<div *ngIf="shared.sse">SSE</div>
-<div *ngIf="!shared.sse">!SSE</div>
-
-<div *ngIf="!shared.player && !shared.sse">
-  <app-register-player></app-register-player>
-</div>
-<div *ngIf="shared.player && !shared.sse">
-  Server non raggiungibile! <span (click)="shared.reconnect()">Connetti!</span>
-</div>
-<div *ngIf="shared.player && shared.sse">
-  <router-outlet></router-outlet>
+  <div *ngIf="!shared.player || !shared.sse" class="fullpage">
+  
+    <div *ngIf="shared.player">Player</div>
+    <div *ngIf="!shared.player">!Player</div>
+    
+    <div *ngIf="shared.sse">SSE</div>
+    <div *ngIf="!shared.sse">!SSE</div>
+    
+    <div *ngIf="!shared.player && !shared.sse">
+      <app-register-player></app-register-player>
+    </div>
+    <div *ngIf="shared.player && !shared.sse">
+      Server non raggiungibile! <span (click)="shared.reconnect()">Connetti!</span>
+    </div>
+  
+  </div>
+  
+  <router-outlet *ngIf="shared.player && shared.sse"></router-outlet>
+  
 </div>
