@@ -34,6 +34,8 @@ export class GameRoomComponent implements OnInit {
   players: PlayerDto[];
   ready: string[];
   score: {[id: string]: number};
+  color: {[id: string]: string};
+  colors: string[];
   mypick: FantascattiPiece;
   moves: PlayerPicksPieceDto[];
 
@@ -67,11 +69,13 @@ export class GameRoomComponent implements OnInit {
       'yellow': '#806600',
       'green': '#008000',
     }
+    this.colors = ['#ff9400', '#ff4600', '#ff0039', '#ff00c2', '#d300ff', '#7b00ff', '#1500ff', '#0084ff', '#00ceff', '#00ffde', '#00ff1b', '#e1ff00'];
     this.piecesmap = {};
     this.pieces.forEach(p => {
       this.piecesmap[p.shape] = p;
     });
     this.score = {};
+    this.color = {};
     this.moves = [];
     this.players = [];    
     this.resetTurn();
@@ -82,6 +86,7 @@ export class GameRoomComponent implements OnInit {
       this.players.push(...table.seats.map(s=>s.player)); // array spread operator!
       this.players.forEach(p => {
         this.score[p.uuid] = 0;
+        this.color[p.uuid] = this.colors.splice(0, 1)[0];
       })
     });
   }

@@ -1,42 +1,57 @@
-<div *ngIf="players">
-    <h1>Giocatori</h1>
-    <div *ngFor="let player of players">
-        {{player.name}}
-        {{score[player.uuid]}}
-        ready: {{ready.includes(player.uuid)}}
-    </div>
+<div class="panel-menu-list top-left-menu leader-board">
+   <svg *ngFor="let player of players" viewBox="0 0 100 100" >
+
+      <g
+         id="score">
+         <path
+            style="fill:{{color[player.uuid]}};opacity:1;vector-effect:none;fill-opacity:1;stroke:none;stroke-width:16.45940018;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+            d="M 6.68066,2.6681395 V 83.103686 L 49.99902,100.00018 93.31934,83.103686 V 2.6681395 Z m 3.92774,2.9023437 h 78.7832 a 1.5119622,1.5119622 0 0 1 1.51172,1.5117187 V 80.222826 a 1.5119622,1.5119622 0 0 1 -0.96289,1.408203 L 50.5498,96.994311 a 1.5119622,1.5119622 0 0 1 -1.09961,0 L 10.05957,81.631029 A 1.5119622,1.5119622 0 0 1 9.09668,80.222826 V 7.0822019 A 1.5119622,1.5119622 0 0 1 10.6084,5.5704832 Z m 1.51172,3.0234375 V 79.189623 L 49.99902,93.963061 87.87988,79.189623 V 8.5939207 Z"
+            id="path916" />
+         <rect
+            transform="rotate(-7.8244993)"
+            ry="0"
+            y="13.218887"
+            x="-1.8165209"
+            height="21.304705"
+            width="98.012115"
+            id="rect918"
+            style="fill:{{color[player.uuid]}};opacity:1;vector-effect:none;fill-opacity:1;stroke:none;stroke-width:6.20337629;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke" />
+         <rect
+            style="opacity:0.3;vector-effect:none;fill:#000000;fill-opacity:1;stroke:none;stroke-width:6.20337629;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+            id="rect1155"
+            width="98.012115"
+            height="21.304705"
+            x="-1.8165209"
+            y="13.218887"
+            ry="0"
+            transform="rotate(-7.8244993)" />
+         <text
+            transform="rotate(-7.8244993)"
+            id="text1051-3"
+            y="31.380138"
+            x="47.218399"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.15882492px;line-height:1.25;font-family:'AR JULIAN';-inkscape-font-specification:'AR JULIAN, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.55398095"
+            xml:space="preserve"><tspan
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.15882492px;font-family:'AR JULIAN';-inkscape-font-specification:'AR JULIAN, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;stroke-width:0.55398095"
+            y="31.380138"
+            x="47.218399"
+            id="tspan1049-6">{{player.name}}</tspan></text>
+         <text
+            xml:space="preserve"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:70.71943665px;line-height:1.25;font-family:'AR JULIAN';-inkscape-font-specification:'AR JULIAN, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.76801884"
+            x="49.995869"
+            y="79.398544"
+            id="text950"><tspan
+            id="tspan948"
+            x="49.995869"
+            y="79.398544"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:70.71943665px;font-family:'AR JULIAN';-inkscape-font-specification:'AR JULIAN, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;stroke-width:1.76801884"
+            >{{score[player.uuid] || 0}}</tspan></text>
+      </g>
+
+   </svg>
+
 </div>
-
-<div *ngIf="guess">
-    ( {{guess.correct }} ):
-    {{guess.shape1}}
-    {{guess.shape2}}
-    {{guess.color1}}
-    {{guess.color2}}
-</div>
-
-<div *ngIf="moves">
-    <div *ngFor="let move of moves">
-        {{move.player.name}} ha scelto {{move.piece.shape}}
-        <span *ngIf="move.score">e ha vinto!</span>
-    </div>
-</div>
-
-<div *ngIf="state === 'wait-for-picks'">
-    <div *ngFor="let piece of pieces" class="selected-piece-{{piece === mypick}}" (click)="pick(piece)">{{piece.color}} {{piece.shape}}</div>
-</div>
-
-<div *ngIf="state === 'wait-for-ready'">
-
-    <div *ngIf="ready && players">
-        {{ready.length}} / {{players.length}}
-    </div>
-
-    <div *ngIf="!ready.includes(shared.player.uuid)" (click)="iAmReady()">Ready!</div>
-
-</div>
-
-<div>{{state}}</div>
 
 <svg viewBox="0 0 100 100" class="fullsvg">
 
