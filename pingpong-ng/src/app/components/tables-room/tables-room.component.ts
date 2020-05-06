@@ -24,6 +24,9 @@ export class TablesRoomComponent implements OnInit {
   players: PlayerDto[];
   tables: TableDto[];
   tablesmap: {[id:string]: TableDto};
+  ownership: {[id:string]: TableDto};
+
+  mytable: TableDto;
 
   connected: boolean;
 
@@ -33,14 +36,17 @@ export class TablesRoomComponent implements OnInit {
     this.initSse();
     this.initTables();
     this.initPlayers();
+    this.createTable();
   }
   
   initTables() {
     this.rest.tables(this.shared.player).subscribe(tables => {
       this.tables = tables;
       this.tablesmap = {};
+      this.ownership = {};
       this.tables.forEach(t=> {
         this.tablesmap[t.uuid] = t;
+        this.ownership[t.owner.uuid] = t;
       });
     });
   }
@@ -100,6 +106,7 @@ export class TablesRoomComponent implements OnInit {
       this.tables.splice(index, 1, dto.table);
     }
     this.tablesmap[dto.table.uuid] = dto.table;
+    this.ownership[dto.table.owner.uuid] = dto.table;
     this.changes.detectChanges();
   }
   onSseTablePlayerAccept(dto: TablePlayerAcceptSseDto) {
@@ -110,11 +117,13 @@ export class TablesRoomComponent implements OnInit {
       this.tables.splice(index, 1, dto.table);
     }
     this.tablesmap[dto.table.uuid] = dto.table;
+    this.ownership[dto.table.owner.uuid] = dto.table;
     this.changes.detectChanges();
   }
   onSseAvailableTable(dto: AvailableTableDto) {
     this.tables.push(dto.table);
     this.tablesmap[dto.table.uuid] = dto.table;
+    this.ownership[dto.table.owner.uuid] = dto.table;
     this.changes.detectChanges();
   }
   onSseStalePlayers(dto: StalePlayersDto) {
@@ -132,18 +141,14 @@ export class TablesRoomComponent implements OnInit {
   createTable() {
     this.rest.newTable({seats: [], owner: this.shared.player}).subscribe(table => {
       console.log(table);
+      this.mytable = table;
     });
   }
 
-  createTableWithPlayer(player: PlayerDto) {
-    const table = {
-      seats: [{player: player, open: false, pending: true}], 
-      owner: this.shared.player
-    }
-    this.rest.newTable(table).subscribe(table => {
-      this.tables.push(table);
-      this.tablesmap[table.uuid] = table;
-      this.changes.detectChanges();
+  clickPlayer(player: PlayerDto) {
+    if (this.shared.player.uuid === player.uuid) return;
+    this.rest.newTablePlayer(this.mytable, player).subscribe(table => {
+      console.log(table);
     });
   }
 

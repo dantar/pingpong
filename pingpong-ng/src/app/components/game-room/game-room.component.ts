@@ -168,7 +168,7 @@ export class GameRoomComponent implements OnInit {
   }
 
   pick(piece: FantascattiPiece) {
-    if (this.mypick === null) {
+    if (this.mypick === null && this.state === 'wait-for-picks') {
       this.mypick = piece;
       this.fantascatti.pickPiece(this.table, this.shared.player, piece).subscribe(r => {
         // loading?
@@ -177,7 +177,7 @@ export class GameRoomComponent implements OnInit {
   }
 
   pickByShape(shape: string) {
-    if (this.mypick === null) {
+    if (this.mypick === null && this.state === 'wait-for-picks') {
       this.mypick = this.piecesmap[shape];
       this.fantascatti.pickPiece(this.table, this.shared.player, this.piecesmap[shape]).subscribe(r => {
         // loading?

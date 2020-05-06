@@ -4,8 +4,8 @@
     <div *ngIf="players">
         <h1>Giocatori {{shared.player.name}}</h1>
         <div *ngFor="let player of players">
-            {{player.name}}
-            <span *ngIf="tables && shared.player.uuid != player.uuid" (click)="createTableWithPlayer(player)">invitalo ad un nuovo tavolo!</span>
+            <div (click)="clickPlayer(player)">{{player.name}}</div>
+            <div *ngIf="ownership[player.uuid]">{{ownership[player.uuid].uuid}}</div>
         </div>
     </div>
     
@@ -24,7 +24,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="shared.player.uuid === table.owner.uuid">Invite players
+            <div *ngIf="shared.player.uuid === table.owner.uuid && players">Invite players
                 <div *ngFor="let player of tableAvailablePlayers(table)">
                     <div (click)="includePlayer(table, player)">{{player.name}}</div>                 
                 </div>
