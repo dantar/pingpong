@@ -119,6 +119,7 @@ export class GameRoomComponent implements OnInit {
 }
 
   iAmReady() {
+    if (this.ready.includes(this.shared.player.uuid)) return;
     this.moves = [];
     this.guess = null;
     this.fantascatti.playerReady(this.table, this.shared.player).subscribe(
