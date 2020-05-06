@@ -60,11 +60,19 @@ public class FantascattiService {
 		FantascattiCardDto result = new FantascattiCardDto()
 				.setCorrect(pieces.get(0).getShape());
 		if (Math.random() < CHANCE_OF_TWIN) {
-			result
-			.setColor1(pieces.get(0).getColor())
-			.setColor2(pieces.get(1).getColor())
-			.setShape1(pieces.get(0).getShape())
-			.setShape2(pieces.get(2).getShape());
+			if (pieces.get(0).getShape().compareTo(pieces.get(1).getShape()) < 0) {				
+				result
+				.setColor1(pieces.get(0).getColor())
+				.setColor2(pieces.get(2).getColor())
+				.setShape1(pieces.get(0).getShape())
+				.setShape2(pieces.get(1).getShape());
+			} else {
+				result
+				.setColor1(pieces.get(2).getColor())
+				.setColor2(pieces.get(0).getColor())
+				.setShape1(pieces.get(1).getShape())
+				.setShape2(pieces.get(0).getShape());
+			}
 		} else {
 			result
 			.setColor1(pieces.get(1).getColor())
