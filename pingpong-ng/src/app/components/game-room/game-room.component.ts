@@ -24,8 +24,12 @@ export class GameRoomComponent implements OnInit {
     private router: Router,
   ) { }
 
+  dragonfill = '#ffff00';
+
   table: TableDto;
   guess: FantascattiCardDto;
+
+  guessKey: string;
 
   players: PlayerDto[];
   ready: string[];
@@ -33,9 +37,13 @@ export class GameRoomComponent implements OnInit {
   mypick: FantascattiPiece;
   moves: PlayerPicksPieceDto[];
 
+  paletteA: {[color:string]: string};
+  paletteB: {[color:string]: string};
+
   state: 'wait-for-players' | 'wait-for-ready' | 'wait-for-guess' | 'wait-for-picks';
 
   pieces: FantascattiPiece[];
+  piecesmap: {[shape:string]: FantascattiPiece};
 
   ngOnInit(): void {
     this.pieces = [
@@ -45,6 +53,24 @@ export class GameRoomComponent implements OnInit {
       {shape: 'gold', color: 'yellow'},
       {shape: 'shield', color: 'green'},
     ];
+    this.paletteA = {
+      'red': '#ff0000',
+      'brown': '#a46102',
+      'blue': '#b3b3b3',
+      'yellow': '#ffff00',
+      'green': '#00ff00',
+    }
+    this.paletteB = {
+      'red': '#800000',
+      'brown': '#550000',
+      'blue': '#333333',
+      'yellow': '#806600',
+      'green': '#008000',
+    }
+    this.piecesmap = {};
+    this.pieces.forEach(p => {
+      this.piecesmap[p.shape] = p;
+    });
     this.score = {};
     this.moves = [];
     this.players = [];    
@@ -101,8 +127,16 @@ export class GameRoomComponent implements OnInit {
   onNewGuess(dto: NewGuessDto) {
     this.moves = [];
     this.guess = dto.guess;
+    this.initGuessKey();
     this.state = 'wait-for-picks';
     this.changes.detectChanges();
+  }
+  initGuessKey() {
+    if (this.guess.shape1.localeCompare(this.guess.shape2) < 0 ) {
+      this.guessKey = this.guess.shape1 + '-' + this.guess.shape2;
+    } else {
+      this.guessKey = this.guess.shape2 + '-' + this.guess.shape1;
+    }
   }
   onSsePlayerReady(dto: PlayerReadyDto) {
     this.ready.push(dto.player.uuid);
@@ -122,6 +156,7 @@ export class GameRoomComponent implements OnInit {
     if (this.ready.includes(this.shared.player.uuid)) return;
     this.moves = [];
     this.guess = null;
+    this.guessKey = null;
     this.fantascatti.playerReady(this.table, this.shared.player).subscribe(
       // loading? 
     );
@@ -131,6 +166,15 @@ export class GameRoomComponent implements OnInit {
     if (this.mypick === null) {
       this.mypick = piece;
       this.fantascatti.pickPiece(this.table, this.shared.player, piece).subscribe(r => {
+        // loading?
+      });
+    }
+  }
+
+  pickByShape(shape: string) {
+    if (this.mypick === null) {
+      this.mypick = this.piecesmap[shape];
+      this.fantascatti.pickPiece(this.table, this.shared.player, this.piecesmap[shape]).subscribe(r => {
         // loading?
       });
     }
