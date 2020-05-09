@@ -8,10 +8,9 @@ import { SharedDataService } from './services/shared-data.service';
 })
 export class AppComponent {
   
-  title = 'pingpong-ng';
+  title = 'Dragon\'s Hoard';
 
   constructor(public shared: SharedDataService) {
-
   }
 
 }

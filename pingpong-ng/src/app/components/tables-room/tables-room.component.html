@@ -27,15 +27,15 @@
             <app-svg-button text="Inizia!"></app-svg-button>
         </div>
         <ng-container *ngIf="mytable.owner.uuid !== shared.player.uuid && isPending(mytable)" >
-            <div (click)="acceptInvitation(mytable, true)">
+            <div (click)="acceptInvitation(mytable, true)" class="svg-button">
                 <app-svg-button text="Accetta!"></app-svg-button>
             </div>
-            <div (click)="acceptInvitation(mytable, false)">
+            <div (click)="acceptInvitation(mytable, false)" class="svg-button">
                 <app-svg-button text="Rifiuta!"></app-svg-button>
             </div>
         </ng-container>
     </ng-container>
-    <div *ngIf="!mytable" (click)="goSolo()">
+    <div *ngIf="!mytable" (click)="goSolo()" class="svg-button">
         <app-svg-button text="Solo!"> </app-svg-button>
     </div>
 </div>

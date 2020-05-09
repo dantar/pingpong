@@ -77,8 +77,16 @@ svg {
     left: 15px;
 }
 
+.bottom-right-menu {
+    bottom: 10px;
+    right: 15px;
+}
+
 @media screen and (orientation:portrait) {
     .panel-menu-list.top-right-menu {
+       flex-direction: row-reverse;
+    }
+    .panel-menu-list.bottom-right-menu {
        flex-direction: row-reverse;
     }
     .panel-menu-item {
@@ -103,6 +111,12 @@ svg {
 @media screen and (orientation:landscape) {
     .panel-menu-list {
        flex-direction: column;
+    }
+    .panel-menu-list.bottom-right-menu {
+       flex-direction: column-reverse;
+    }
+    .panel-menu-list.bottom-left-menu {
+       flex-direction: column-reverse;
     }
     .panel-menu-item {
        width: 40px;

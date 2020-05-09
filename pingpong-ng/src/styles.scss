@@ -4,8 +4,17 @@
     }
 }
 
-.my-table{
+.svg-button {
     svg {
+        height: 60px;
+    }
+}
+
+.my-table{
+    .my-avatar svg {
+        height: 80px;
+    }
+    .other-player svg {
         height: 60px;
     }
     .seat-pending-true {
