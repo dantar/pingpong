@@ -25,6 +25,7 @@ export class TablesRoomComponent implements OnInit {
   tables: TableDto[];
   tablesmap: {[id:string]: TableDto};
   ownership: {[id:string]: TableDto};
+  seatedmap: {[id:string]: TableDto};
   color = "#ff0000";
 
   mytable: TableDto;
@@ -37,17 +38,22 @@ export class TablesRoomComponent implements OnInit {
     this.initSse();
     this.initTables();
     this.initPlayers();
-    this.createTable();
+    //this.createTable();
   }
   
   initTables() {
     this.tablesmap = {};
     this.ownership = {};
+    this.seatedmap = {};
     this.rest.tables(this.shared.player).subscribe(tables => {
       this.tables = tables;
       this.tables.forEach(t=> {
         this.tablesmap[t.uuid] = t;
         this.ownership[t.owner.uuid] = t;
+        this.seatedmap[t.owner.uuid] = t;
+        t.seats.forEach(s => {
+          this.seatedmap[s.player.uuid] = t;
+        });
       });
     });
   }
@@ -108,6 +114,10 @@ export class TablesRoomComponent implements OnInit {
     }
     this.tablesmap[dto.table.uuid] = dto.table;
     this.ownership[dto.table.owner.uuid] = dto.table;
+    this.seatedmap[dto.player.uuid] = dto.table;
+    if (dto.player.uuid === this.shared.player.uuid || dto.table.owner.uuid === this.shared.player.uuid) {
+      this.mytable = dto.table;
+    }
     this.changes.detectChanges();
   }
   onSseTablePlayerAccept(dto: TablePlayerAcceptSseDto) {
@@ -119,12 +129,17 @@ export class TablesRoomComponent implements OnInit {
     }
     this.tablesmap[dto.table.uuid] = dto.table;
     this.ownership[dto.table.owner.uuid] = dto.table;
+    if (!dto.accept) {
+      delete this.seatedmap[dto.player.uuid];
+      if (dto.player.uuid === this.shared.player.uuid) this.mytable = null;
+    }
     this.changes.detectChanges();
   }
   onSseAvailableTable(dto: AvailableTableDto) {
     this.tables.push(dto.table);
     this.tablesmap[dto.table.uuid] = dto.table;
     this.ownership[dto.table.owner.uuid] = dto.table;
+    if (dto.table.owner.uuid === this.shared.player.uuid) this.mytable = dto.table;
     this.changes.detectChanges();
   }
   onSseStalePlayers(dto: StalePlayersDto) {
@@ -147,7 +162,16 @@ export class TablesRoomComponent implements OnInit {
   }
 
   clickPlayer(player: PlayerDto) {
-    if (this.shared.player.uuid === player.uuid) return;
+    if (this.mytable) {
+      this._invitePlayer(player);
+    } else {
+      this.rest.newTable({seats: [], owner: this.shared.player}).subscribe(table => {
+        this.mytable = table;
+        this._invitePlayer(player);
+      });
+    }
+  }
+  _invitePlayer(player: PlayerDto) {
     this.rest.newTablePlayer(this.mytable, player).subscribe(table => {
       console.log(table);
     });

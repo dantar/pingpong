@@ -48,7 +48,7 @@ public class TablesController {
 	@PostMapping("/table")
 	public TableDto postTable(@RequestBody TableDto table) {
 		this.pingpongService.newTable(table);
-		pingpongService.broadcastMessageToTable(table, new AvailableTableSseDto().setTable(table));
+		pingpongService.broadcastMessage(new AvailableTableSseDto().setTable(table));
 		return table;
 	}
 
@@ -64,7 +64,7 @@ public class TablesController {
 				.setPending(true)
 				.setPlayer(player)
 				);
-		pingpongService.broadcastMessageToTable(table, new TablePlayerInvitationSseDto()
+		pingpongService.broadcastMessage(new TablePlayerInvitationSseDto()
 				.setTable(table)
 				.setPlayer(player));
 		return table;
@@ -78,7 +78,7 @@ public class TablesController {
 		.collect(Collectors.toMap(s->s.getPlayer().getUuid(), Function.identity()))
 		.get(player.getUuid())
 		.setPending(false);
-		pingpongService.broadcastMessageToTable(table, new TablePlayerAcceptSseDto()
+		pingpongService.broadcastMessage(new TablePlayerAcceptSseDto()
 				.setTable(table)
 				.setPlayer(player)
 				.setAccepted(true));
@@ -93,7 +93,7 @@ public class TablesController {
 		.collect(Collectors.toMap(s->s.getPlayer().getUuid(), Function.identity()))
 		.get(player.getUuid());
 		table.getSeats().remove(seat);
-		pingpongService.broadcastMessageToTable(table, new TablePlayerAcceptSseDto()
+		pingpongService.broadcastMessage(new TablePlayerAcceptSseDto()
 				.setTable(table)
 				.setPlayer(player)
 				.setAccepted(false));
