@@ -28,6 +28,7 @@
               "src/assets"
             ],
             "styles": [
+              "src/smartapp.scss",
               "src/styles.scss",
               "src/fantascatti.scss"
             ],

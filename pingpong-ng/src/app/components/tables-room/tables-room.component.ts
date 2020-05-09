@@ -65,7 +65,7 @@ export class TablesRoomComponent implements OnInit {
 
   initPlayers() {
     this.rest.players().subscribe(players=> {
-      this.players = players;
+      this.players = players.filter(p => p.uuid != this.shared.player.uuid);
     });
   }
 

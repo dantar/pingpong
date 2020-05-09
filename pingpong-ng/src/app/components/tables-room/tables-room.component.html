@@ -1,8 +1,17 @@
-<div class="panel-menu-list top-left-menu leader-board">
+<div class="panel-menu-list top-left-menu my-table">
     <app-player-avatar [player]="shared.player"></app-player-avatar>
 </div>
  
 <div class="fullpage">
+
+    <div class="all-players">
+        <div *ngFor="let player of players">
+            <div (click)="clickPlayer(player)">
+                <app-player-avatar [player]="player"></app-player-avatar>
+            </div>
+            <div *ngIf="ownership && ownership[player.uuid]">{{ownership[player.uuid].uuid}}</div>
+        </div>
+    </div>
 
     <div *ngIf="players">
         <h1>Giocatori {{shared.player.name}}</h1>
