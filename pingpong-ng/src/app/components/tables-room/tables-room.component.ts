@@ -180,7 +180,7 @@ export class TablesRoomComponent implements OnInit {
 
   startTable(table: TableDto) {
     this.rest.startTable(table).subscribe(t => {
-      
+      console.log(t);
     });
     this.router.navigate(['table', table.uuid]);
   }
@@ -209,4 +209,13 @@ export class TablesRoomComponent implements OnInit {
   tableCanStart(table: TableDto) {
     return table.seats.filter(s=>s.pending || s.open).length === 0;
   }
+
+  goSolo() {
+    this.rest.newTable({seats: [], owner: this.shared.player}).subscribe(table => {
+      console.log(table);
+      this.mytable = table;
+      this.startTable(this.mytable);
+    });
+  }
+
 }

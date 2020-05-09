@@ -9,6 +9,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { RegisterPlayerComponent } from './components/register-player/register-player.component';
 import { GameRoomComponent } from './components/game-room/game-room.component';
 import { PlayerAvatarComponent } from './components/player-avatar/player-avatar.component';
+import { SvgButtonComponent } from './components/svg-button/svg-button.component';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { PlayerAvatarComponent } from './components/player-avatar/player-avatar.
     TablesRoomComponent,
     RegisterPlayerComponent,
     GameRoomComponent,
-    PlayerAvatarComponent
+    PlayerAvatarComponent,
+    SvgButtonComponent
   ],
   imports: [
     BrowserModule,
