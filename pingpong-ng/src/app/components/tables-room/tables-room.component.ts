@@ -115,7 +115,8 @@ export class TablesRoomComponent implements OnInit {
     this.tablesmap[dto.table.uuid] = dto.table;
     this.ownership[dto.table.owner.uuid] = dto.table;
     this.seatedmap[dto.player.uuid] = dto.table;
-    if (dto.player.uuid === this.shared.player.uuid || dto.table.owner.uuid === this.shared.player.uuid) {
+    if (dto.player.uuid === this.shared.player.uuid || dto.table.owner.uuid === this.shared.player.uuid ||
+      (this.mytable && this.mytable.uuid === dto.table.uuid)) {
       this.mytable = dto.table;
     }
     this.changes.detectChanges();

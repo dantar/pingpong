@@ -6,7 +6,10 @@
 
 .my-table{
     svg {
-        height: 80px;
+        height: 60px;
+    }
+    .seat-pending-true {
+        opacity: 0.5;
     }
 }
 

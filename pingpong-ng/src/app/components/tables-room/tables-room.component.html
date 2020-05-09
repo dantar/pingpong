@@ -1,8 +1,17 @@
 <div class="panel-menu-list top-left-menu my-table">
-    <app-player-avatar [player]="shared.player"></app-player-avatar>
-    <div *ngIf="mytable">
-        <app-player-avatar *ngFor="let seat of mytable.seats" [player]="seat.player"></app-player-avatar>
+    <div class="my-avatar">
+        <app-player-avatar [player]="shared.player"></app-player-avatar>
     </div>
+    <ng-container *ngIf="mytable">
+        <div class="other-player table-owner">
+            <app-player-avatar *ngIf="mytable.owner.uuid !== shared.player.uuid" [player]="mytable.owner"></app-player-avatar>
+        </div>
+        <ng-container *ngFor="let seat of mytable.seats">
+            <div *ngIf="seat.player.uuid !== shared.player.uuid" class="other-player seat-pending-{{seat.pending}}">
+                <app-player-avatar [player]="seat.player"></app-player-avatar>
+            </div>
+        </ng-container>
+    </ng-container>
 </div>
  
 <div class="fullpage">
