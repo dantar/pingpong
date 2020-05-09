@@ -10,6 +10,7 @@ import { RegisterPlayerComponent } from './components/register-player/register-p
 import { GameRoomComponent } from './components/game-room/game-room.component';
 import { PlayerAvatarComponent } from './components/player-avatar/player-avatar.component';
 import { SvgButtonComponent } from './components/svg-button/svg-button.component';
+import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
 
 @NgModule({
@@ -27,7 +28,9 @@ import { SvgButtonComponent } from './components/svg-button/svg-button.component
     HttpClientModule,
     FormsModule,
   ],
-  providers: [],
+  providers: [
+    {provide: LocationStrategy, useClass: HashLocationStrategy},
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

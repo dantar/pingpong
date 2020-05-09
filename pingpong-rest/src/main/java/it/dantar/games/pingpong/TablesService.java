@@ -74,7 +74,7 @@ public class TablesService {
 						.data(message, MediaType.APPLICATION_JSON)
 						);
 				Logger.getLogger(this.getClass().getName()).info(String.format("Sse sent to %s", player.getDto().getUuid()));
-			} catch (IOException e) {
+			} catch (IOException | IllegalStateException e) {
 				Logger.getLogger(this.getClass().getName()).info(String.format("Stale emitter: %s", player.getDto().getUuid()));
 				emitter.completeWithError(e);
 				player.setEmitter(null);
