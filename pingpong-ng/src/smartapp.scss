@@ -6,6 +6,10 @@
     font-weight:300;
 }
 
+svg {
+    user-select: none;
+}
+
 .bg {
     position: fixed;
     height: 100%;
