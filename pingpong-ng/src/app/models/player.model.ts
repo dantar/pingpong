@@ -2,7 +2,12 @@ export class PlayerDto {
 
     name: string;
     uuid?: string;
+    avatar: AvatarDto;
 
+}
+
+export class AvatarDto {
+    color: string;
 }
 
 export class TableDto {

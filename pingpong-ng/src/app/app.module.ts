@@ -8,6 +8,7 @@ import { TablesRoomComponent } from './components/tables-room/tables-room.compon
 import { HttpClientModule } from '@angular/common/http';
 import { RegisterPlayerComponent } from './components/register-player/register-player.component';
 import { GameRoomComponent } from './components/game-room/game-room.component';
+import { PlayerAvatarComponent } from './components/player-avatar/player-avatar.component';
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import { GameRoomComponent } from './components/game-room/game-room.component';
     AppComponent,
     TablesRoomComponent,
     RegisterPlayerComponent,
-    GameRoomComponent
+    GameRoomComponent,
+    PlayerAvatarComponent
   ],
   imports: [
     BrowserModule,

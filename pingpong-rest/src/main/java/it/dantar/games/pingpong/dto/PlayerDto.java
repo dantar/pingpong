@@ -4,6 +4,7 @@ public class PlayerDto {
 
 	String name;
 	String uuid;
+	AvatarDto avatar;
 
 	public String getName() {
 		return name;
@@ -17,6 +18,13 @@ public class PlayerDto {
 	}
 	public PlayerDto setUuid(String uuid) {
 		this.uuid = uuid;
+		return this;
+	}
+	public AvatarDto getAvatar() {
+		return avatar;
+	}
+	public PlayerDto setAvatar(AvatarDto avatar) {
+		this.avatar = avatar;
 		return this;
 	}
 	

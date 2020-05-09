@@ -25,6 +25,7 @@ export class TablesRoomComponent implements OnInit {
   tables: TableDto[];
   tablesmap: {[id:string]: TableDto};
   ownership: {[id:string]: TableDto};
+  color = "#ff0000";
 
   mytable: TableDto;
 
@@ -40,10 +41,10 @@ export class TablesRoomComponent implements OnInit {
   }
   
   initTables() {
+    this.tablesmap = {};
+    this.ownership = {};
     this.rest.tables(this.shared.player).subscribe(tables => {
       this.tables = tables;
-      this.tablesmap = {};
-      this.ownership = {};
       this.tables.forEach(t=> {
         this.tablesmap[t.uuid] = t;
         this.ownership[t.owner.uuid] = t;

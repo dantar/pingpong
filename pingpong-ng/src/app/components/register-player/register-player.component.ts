@@ -19,7 +19,7 @@ export class RegisterPlayerComponent implements OnInit {
   player: PlayerDto;
 
   ngOnInit(): void {
-    this.player = {name: ''};
+    this.player = {name: '', avatar: {color: '#ff0000'}};
   }
 
   register() {
