@@ -45,7 +45,7 @@ export class TablesRoomComponent implements OnInit {
     this.tablesmap = {};
     this.ownership = {};
     this.seatedmap = {};
-    this.rest.tables(this.shared.player).subscribe(tables => {
+    this.rest.allTables().subscribe(tables => {
       this.tables = tables;
       this.tables.forEach(t=> {
         this.tablesmap[t.uuid] = t;
@@ -130,17 +130,25 @@ export class TablesRoomComponent implements OnInit {
     }
     this.tablesmap[dto.table.uuid] = dto.table;
     this.ownership[dto.table.owner.uuid] = dto.table;
-    if (!dto.accept) {
+    if (!dto.accepted) {
       delete this.seatedmap[dto.player.uuid];
-      if (dto.player.uuid === this.shared.player.uuid) this.mytable = null;
+      if (dto.player.uuid === this.shared.player.uuid) {
+        this.mytable = null;
+      }
     }
+    if (this.mytable && this.mytable.uuid === dto.table.uuid) {
+      this.mytable = dto.table;
+    }    
     this.changes.detectChanges();
   }
   onSseAvailableTable(dto: AvailableTableDto) {
     this.tables.push(dto.table);
     this.tablesmap[dto.table.uuid] = dto.table;
     this.ownership[dto.table.owner.uuid] = dto.table;
-    if (dto.table.owner.uuid === this.shared.player.uuid) this.mytable = dto.table;
+    this.seatedmap[dto.table.owner.uuid] = dto.table;
+    if (dto.table.owner.uuid === this.shared.player.uuid) {
+      this.mytable = dto.table;
+    }
     this.changes.detectChanges();
   }
   onSseStalePlayers(dto: StalePlayersDto) {
@@ -192,8 +200,8 @@ export class TablesRoomComponent implements OnInit {
     });
   }
 
-  acceptInvitation(table: TableDto, seat: SeatDto, accept: boolean) {
-    this.rest.acceptInvitation(table, seat, accept).subscribe(t => {
+  acceptInvitation(table: TableDto, accept: boolean) {
+    this.rest.acceptInvitation(table, this.shared.player, accept).subscribe(t => {
       console.log(t);
     });
     if (! accept) {
@@ -208,6 +216,10 @@ export class TablesRoomComponent implements OnInit {
 
   tableCanStart(table: TableDto) {
     return table.seats.filter(s=>s.pending || s.open).length === 0;
+  }
+
+  isPending(table: TableDto) {
+    return table.seats.filter(s=>s.pending && s.player && s.player.uuid === this.shared.player.uuid).length > 0;
   }
 
   goSolo() {

@@ -110,6 +110,11 @@ public class TablesController {
 		return pingpongService.listPlayerTables(playerId);
 	}
 
+	@GetMapping("/tables")
+	public List<TableDto> getAllTables() {
+		return pingpongService.listAllTables();
+	}
+
 	@PostMapping("/table/{tableId}/start")
 	public TableDto startTable(@PathVariable String tableId) {
 		TableDto table = pingpongService.getTable(tableId);

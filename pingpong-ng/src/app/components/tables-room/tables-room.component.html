@@ -5,45 +5,8 @@
             <div (click)="clickPlayer(player)" class="available-player seated-{{seatedmap.hasOwnProperty(player.uuid)}}">
                 <app-player-avatar [player]="player"></app-player-avatar>
             </div>
-            <div *ngIf="ownership && ownership[player.uuid]">{{ownership[player.uuid].uuid}}</div>
         </div>
     </div>
-
-    <div *ngIf="players">
-        <h1>Giocatori {{shared.player.name}}</h1>
-        <div *ngFor="let player of players">
-            <div (click)="clickPlayer(player)">{{player.name}}</div>
-            <div *ngIf="ownership && ownership[player.uuid]">{{ownership[player.uuid].uuid}}</div>
-        </div>
-    </div>
-
-    <h1>Tavolo: <span *ngIf="mytable">{{mytable.uuid}}</span></h1>
-
-    <div *ngIf="tables">
-        <h1>Tavoli</h1>
-        <div *ngFor="let table of tables">
-            <div>Tavolo {{table.uuid}}</div>
-            <div *ngIf="table.owner.uuid === shared.player.uuid" (click)="dropTable(table)">drop table</div>
-            <div>Owner: {{table.owner.name}}</div>
-            <div>
-                <div *ngFor="let seat of table.seats">
-                    {{seat.open}} {{seat.pending}} {{seat.player && seat.player.name}}
-                    <div *ngIf="seat.pending && seat.player && seat.player.uuid === shared.player.uuid">
-                        <span (click)="acceptInvitation(table, seat, true)">accetta</span>
-                        <span (click)="acceptInvitation(table, seat, false)">rifiuta</span>
-                    </div>
-                </div>
-            </div>
-            <div *ngIf="shared.player.uuid === table.owner.uuid && players">Invite players
-                <div *ngFor="let player of tableAvailablePlayers(table)">
-                    <div (click)="includePlayer(table, player)">{{player.name}}</div>                 
-                </div>
-                <div *ngIf="tableCanStart(table)" (click)="startTable(table)">Inizia!</div>
-            </div>
-        </div>
-    </div>
-    
-    <div *ngIf="tables" (click)="createTable()">Nuovo tavolo</div>
 
 </div>
 
@@ -60,11 +23,19 @@
                 <app-player-avatar [player]="seat.player"></app-player-avatar>
             </div>
         </ng-container>
-        <div *ngIf="mytable.owner.uuid === shared.player.uuid && tableCanStart(mytable)">
+        <div *ngIf="mytable.owner.uuid === shared.player.uuid && tableCanStart(mytable)" (click)="startTable(mytable)">
             <app-svg-button text="Inizia!"></app-svg-button>
         </div>
+        <ng-container *ngIf="mytable.owner.uuid !== shared.player.uuid && isPending(mytable)" >
+            <div (click)="acceptInvitation(mytable, true)">
+                <app-svg-button text="Accetta!"></app-svg-button>
+            </div>
+            <div (click)="acceptInvitation(mytable, false)">
+                <app-svg-button text="Rifiuta!"></app-svg-button>
+            </div>
+        </ng-container>
     </ng-container>
-    <div (click)="goSolo()">
+    <div *ngIf="!mytable" (click)="goSolo()">
         <app-svg-button text="Solo!"> </app-svg-button>
     </div>
 </div>

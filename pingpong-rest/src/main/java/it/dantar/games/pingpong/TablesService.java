@@ -36,6 +36,7 @@ public class TablesService {
 	
 	Map<String, Player> players = new HashMap<String, Player>();
 	Map<String, Table> tables = new HashMap<String, Table>();
+	Map<String, Table> owners = new HashMap<String, Table>();
 	
 	static final long TIMEOUT = 1000*60*60*4L;
 	
@@ -82,7 +83,13 @@ public class TablesService {
 		});
 		if (stale.size() > 0) {
 			stale.forEach(player -> {
-				this.players.remove(player.getDto().getUuid());
+				String playerUuid = player.getDto().getUuid();
+				Table table = this.owners.get(playerUuid);
+				if (table != null) {
+					this.owners.remove(playerUuid);
+					this.tables.remove(table.getDto().getUuid());
+				}
+				this.players.remove(playerUuid);
 			});
 			this.broadcastMessage(new DroppedStalePlayerSseDto()
 					.setPlayers(
@@ -110,6 +117,7 @@ public class TablesService {
 		table.setUuid(UUID.randomUUID().toString());
 		fantascattiService.newGame(table);
 		this.tables.put(table.getUuid(), new Table().setDto(table));
+		this.owners.put(table.getOwner().getUuid(), this.tables.get(table.getUuid()));
 	}
 
 	public TableDto getTable(String uuid) {
@@ -165,6 +173,12 @@ public class TablesService {
 
 	public void broadcastMessageToPlayer(PlayerDto player, SseDto message) {
 		this.broadcastMessageToPlayers(message, Arrays.asList(this.players.get(player.getUuid())).stream());
+	}
+
+	public List<TableDto> listAllTables() {
+		return this.tables.entrySet().stream()
+				.map(entry -> entry.getValue().getDto())
+				.collect(Collectors.toList());
 	}
 
 }

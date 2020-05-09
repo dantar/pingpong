@@ -40,7 +40,7 @@ export class TablePlayerAcceptSseDto extends MessageDto {
     code = TablePlayerAcceptSseDto.CODE;
     table: TableDto;
     player: PlayerDto;
-    accept: boolean;
+    accepted: boolean;
 }
 export class TableStartSseDto extends MessageDto {
     static CODE = 'table-start';

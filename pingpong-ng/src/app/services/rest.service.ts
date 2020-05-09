@@ -9,7 +9,6 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class RestService {
-
   constructor(private http: HttpClient) { }
 
   register(player: PlayerDto): Observable<PlayerDto> {
@@ -24,9 +23,9 @@ export class RestService {
     return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + '/invite', player);
   }
 
-  acceptInvitation(table: TableDto, seat: SeatDto, accept: boolean) {
+  acceptInvitation(table: TableDto, player: PlayerDto, accept: boolean) {
     const action = accept ? '/accept' : '/reject';
-    return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + action, seat.player);
+    return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + action, player);
   }
   
   players(): Observable<PlayerDto[]> {
@@ -35,6 +34,10 @@ export class RestService {
 
   tables(player: PlayerDto): Observable<TableDto[]> {
     return this.http.get<TableDto[]>(environment.server + '/tables/' + player.uuid);
+  }
+
+  allTables(): Observable<TableDto[]> {
+    return this.http.get<TableDto[]>(environment.server + '/tables');
   }
 
   table(uuid: string): Observable<TableDto> {
