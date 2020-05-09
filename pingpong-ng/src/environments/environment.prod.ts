@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  server: 'http://ada-devel.hyperborea.com/rest/hoard'
 };
