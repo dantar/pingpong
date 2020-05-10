@@ -1,0 +1,10 @@
+<div class="fullpage">
+
+    <div>Player: {{shared.player ? true : false}}</div>
+    <div>Connected: {{shared.connected}}</div>
+    <div>SSE: {{shared.sse ? true : false}}</div>
+
+    <div (click)="refresh()">refresh</div>
+    <div (click)="router.navigate(['tables'])">tables</div>
+
+</div>

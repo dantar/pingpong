@@ -12,10 +12,18 @@ export class LoggedGuardService {
     private router: Router) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    if (this.shared.player && this.shared.player.uuid) {
+    if (this.shared.player && this.shared.player.uuid && this.shared.connected) {
       return true;
     }
-    this.router.navigate(['register']);
+    if (!this.shared.player || !this.shared.player.uuid) {
+      this.router.navigate(['register']);
+      return false;
+    }
+    if (!this.shared.connected) {
+      this.router.navigate(['connecting']);
+      return false;
+    }
+    this.router.navigate(['']);
     return false;
   }
 
