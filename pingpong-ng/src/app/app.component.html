@@ -1,6 +1,6 @@
 <div class="bg">
 
-  <div *ngIf="!shared.player || !shared.sse" class="fullpage">
+  <div *ngIf="!shared.player || !shared.sse || !shared.connected" class="fullpage">
   
     <div *ngIf="shared.player">Player</div>
     <div *ngIf="!shared.player">!Player</div>
@@ -14,7 +14,11 @@
     <div *ngIf="shared.player && !shared.sse">
       Server non raggiungibile! <span (click)="shared.reconnect()">Connetti!</span>
     </div>
-  
+
+    <div *ngIf="shared.player && shared.sse && !shared.connected">
+      Connessione in corso... <span (click)="refresh!">attendi!</span>
+    </div>
+
   </div>
   
   <router-outlet *ngIf="shared.player && shared.sse"></router-outlet>

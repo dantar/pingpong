@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { SharedDataService } from './services/shared-data.service';
 
 @Component({
@@ -10,7 +10,14 @@ export class AppComponent {
   
   title = 'Dragon\'s Hoard';
 
-  constructor(public shared: SharedDataService) {
+  constructor(
+    private changes: ChangeDetectorRef,
+    public shared: SharedDataService) {
+  }
+
+  refresh() {
+    console.log('refresh');
+    this.changes.detectChanges();
   }
 
 }

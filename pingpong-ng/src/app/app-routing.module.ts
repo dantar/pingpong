@@ -8,11 +8,11 @@ import { SseConnectionComponent } from './components/sse-connection/sse-connecti
 
 
 const routes: Routes = [
-  {path: '', component: TablesRoomComponent, canActivate: [LoggedGuardService]},
+  {path: '', component: TablesRoomComponent},
   {path: 'register', component: RegisterPlayerComponent},
   {path: 'connecting', component: SseConnectionComponent},
-  {path: 'tables', component: TablesRoomComponent, canActivate: [LoggedGuardService]},
-  {path: 'table/:uuid', component: GameRoomComponent, canActivate: [LoggedGuardService]},
+  {path: 'tables', component: TablesRoomComponent},
+  {path: 'table/:uuid', component: GameRoomComponent},
 ];
 
 @NgModule({

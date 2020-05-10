@@ -93,8 +93,12 @@ export class GameRoomComponent implements OnInit, OnDestroy {
     console.log("init SSE", this);
   }
   destroySse() {
-    this.shared.sse.removeEventListener('message', this.messageEventListener);
-    console.log("destroy SSE", this);
+    if (this.shared.sse) {
+      console.log("destroy SSE: removed event listener", this);
+      this.shared.sse.removeEventListener('message', this.messageEventListener);
+    } else {
+      console.log("destroy SSE", this);
+    }
   }
   messageEventListener = (
     message => {
