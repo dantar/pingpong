@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TableDto, PlayerDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
@@ -14,7 +14,7 @@ import { FantascattiService } from 'src/app/services/fantascatti.service';
   templateUrl: './game-room.component.html',
   styleUrls: ['./game-room.component.scss']
 })
-export class GameRoomComponent implements OnInit {
+export class GameRoomComponent implements OnInit, OnDestroy {
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -74,7 +74,7 @@ export class GameRoomComponent implements OnInit {
     this.moves = [];
     this.players = [];    
     this.resetTurn();
-    this.initSse(this.activatedRoute.snapshot.params['uuid']);
+    this.initSse();
     this.rest.table(this.activatedRoute.snapshot.params['uuid']).subscribe(table => {
       this.table = table;
       this.players.push(table.owner);
@@ -84,12 +84,23 @@ export class GameRoomComponent implements OnInit {
       })
     });
   }
-
-  initSse(uuid: string) {
-    this.shared.sse.addEventListener('message', message => {
-      this.onSseEvent(JSON.parse(message.data) as MessageDto);
-    })
+  ngOnDestroy(): void {
+    this.destroySse();
   }
+
+  initSse() {
+    this.shared.sse.addEventListener('message', this.messageEventListener)
+    console.log("init SSE", this);
+  }
+  destroySse() {
+    this.shared.sse.removeEventListener('message', this.messageEventListener);
+    console.log("destroy SSE", this);
+  }
+  messageEventListener = (
+    message => {
+      this.onSseEvent(JSON.parse(message.data) as MessageDto);
+    }    
+  );
 
   onSseEvent(dto: FantascattiSseDto) {
     console.log('event ' + dto.code, dto);

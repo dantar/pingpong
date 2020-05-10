@@ -39,7 +39,9 @@ export class SharedDataService {
  
   setPlayer(player: PlayerDto) {
     this.player = player;
-    //localStorage.setItem('player-dto', JSON.stringify(this.player));
+    if (environment.store) {
+      localStorage.setItem('player-dto', JSON.stringify(this.player));
+    }
   }
 
   reconnect() {

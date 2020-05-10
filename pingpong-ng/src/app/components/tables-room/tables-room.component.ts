@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SharedDataService } from 'src/app/services/shared-data.service';
 import { PlayerDto, TableDto, SeatDto } from 'src/app/models/player.model';
@@ -14,7 +14,7 @@ import { PlayerQuitDto } from 'src/app/models/fantascatti.model';
   templateUrl: './tables-room.component.html',
   styleUrls: ['./tables-room.component.scss']
 })
-export class TablesRoomComponent implements OnInit {
+export class TablesRoomComponent implements OnInit, OnDestroy {
 
   constructor(private http: HttpClient, 
     public shared: SharedDataService,
@@ -30,17 +30,17 @@ export class TablesRoomComponent implements OnInit {
 
   mytable: TableDto;
 
-  connected: boolean;
-
   ngOnInit(): void {
     this.players = null;
     this.tables = null;
     this.initSse();
     this.initTables();
     this.initPlayers();
-    //this.createTable();
   }
-  
+  ngOnDestroy(): void {
+    this.destroySse();
+  }
+
   initTables() {
     this.tablesmap = {};
     this.ownership = {};
@@ -63,11 +63,18 @@ export class TablesRoomComponent implements OnInit {
   }
 
   initSse() {
-    this.connected = false;
-    this.shared.sse.addEventListener('message', message => {
-      this.onSseEvent(JSON.parse(message.data) as SseDto);
-    })
+    this.shared.sse.addEventListener('message', this.messageEventListener)
+    console.log("init SSE", this);
   }
+  destroySse() {
+    this.shared.sse.removeEventListener('message', this.messageEventListener);
+    console.log("destroy SSE", this);
+  }
+  messageEventListener = (
+    message => {
+      this.onSseEvent(JSON.parse(message.data) as SseDto);
+    }    
+  );
 
   initPlayers() {
     this.rest.players().subscribe(players=> {
