@@ -1,4 +1,4 @@
-import { PlayerDto } from './player.model';
+import { PlayerDto, TableDto } from './player.model';
 
 export class FantascattiSseDto {
     code: string;
@@ -29,6 +29,7 @@ export class PlayerQuitDto extends FantascattiSseDto {
     static CODE = 'player-quit';
     code = PlayerQuitDto.CODE;
     player: PlayerDto;
+    table?: TableDto;
 }
 
 export class FantascattiCardDto {

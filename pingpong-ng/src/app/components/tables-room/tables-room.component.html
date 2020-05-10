@@ -23,7 +23,7 @@
                 <app-player-avatar [player]="seat.player"></app-player-avatar>
             </div>
         </ng-container>
-        <div *ngIf="mytable.owner.uuid === shared.player.uuid && tableCanStart(mytable)" (click)="startTable(mytable)">
+        <div *ngIf="(mytable.owner.uuid === shared.player.uuid) && tableCanStart(mytable)" (click)="startTable(mytable)" class="svg-button">
             <app-svg-button text="Inizia!"></app-svg-button>
         </div>
         <ng-container *ngIf="mytable.owner.uuid !== shared.player.uuid && isPending(mytable)" >

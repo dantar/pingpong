@@ -8,12 +8,20 @@ public class FantascattiPlayerQuitSseDto extends SseDto {
 	}
 
 	PlayerDto player;
+	TableDto table;
 
 	public PlayerDto getPlayer() {
 		return player;
 	}
 	public FantascattiPlayerQuitSseDto setPlayer(PlayerDto player) {
 		this.player = player;
+		return this;
+	}
+	public TableDto getTable() {
+		return table;
+	}
+	public FantascattiPlayerQuitSseDto setTable(TableDto table) {
+		this.table = table;
 		return this;
 	}
 

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -121,11 +122,18 @@ public class FantascattiService {
 			this.tablesService.removeTable(table);
 		} else {
 			// update game
+			table.setSeats(table.getSeats().stream()
+					.filter(s-> s.getPlayer()== null || !s.getPlayer().getUuid().equals(player.getUuid()))
+					.collect(Collectors.toList())
+					);
 			_removePlayerFromSet(player.getUuid(), game.getPicks());
 			_removePlayerFromSet(player.getUuid(), game.getReady());
 			if (game.getScore().containsKey(player.getUuid())) game.getScore().remove(player.getUuid());
 		}
-		tablesService.broadcastMessage(new FantascattiPlayerQuitSseDto().setPlayer(player));
+		tablesService.broadcastMessage(new FantascattiPlayerQuitSseDto()
+				.setPlayer(player)
+				.setTable(table)
+				);
 	}
 
 	private void _removePlayerFromSet(String uuid, Collection<String> uuids) {

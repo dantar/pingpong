@@ -155,6 +155,8 @@ export class GameRoomComponent implements OnInit {
     if (this.ready.includes(dto.player.uuid)) this.ready.splice(this.ready.indexOf(dto.player.uuid), 1);
     delete this.score[dto.player.uuid];
     this.moves = this.moves.filter(m => m.player.uuid!==dto.player.uuid);
+    this.table = dto.table;
+    this.players = this.players.filter(p => p.uuid != dto.player.uuid);
     this.changes.detectChanges();
   }
 
