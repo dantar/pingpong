@@ -7,6 +7,7 @@ import { MessageDto as SseDto, RegisterPlayerDto, StalePlayersDto, AvailableTabl
   TablePlayerAcceptSseDto, TablePlayerInvitationSseDto, TableStartSseDto } from 'src/app/models/operations-dto.model';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
+import { PlayerQuitDto } from 'src/app/models/fantascatti.model';
 
 @Component({
   selector: 'app-tables-room',
@@ -26,7 +27,6 @@ export class TablesRoomComponent implements OnInit {
   tablesmap: {[id:string]: TableDto};
   ownership: {[id:string]: TableDto};
   seatedmap: {[id:string]: TableDto};
-  color = "#ff0000";
 
   mytable: TableDto;
 
@@ -96,6 +96,9 @@ export class TablesRoomComponent implements OnInit {
       case TableStartSseDto.CODE:
         this.onSseTableStartSseDto(dto as TableStartSseDto);
         break;
+      case PlayerQuitDto.CODE:
+        this.onPlayerQuit(dto as PlayerQuitDto);
+        break;
       default:
         console.log('cannot handle event', dto);
         break;
@@ -158,6 +161,19 @@ export class TablesRoomComponent implements OnInit {
   }
   onSseRegisterPlayer(dto: RegisterPlayerDto) {
     this.players.push(dto.player);
+    this.changes.detectChanges();
+  }
+  onPlayerQuit(dto: PlayerQuitDto) {
+    delete this.seatedmap[dto.player.uuid];
+    if (this.ownership.hasOwnProperty(dto.player.uuid)) {
+      const table = this.ownership[dto.player.uuid];
+      table.seats.forEach(s => {
+        if (s.player && this.seatedmap.hasOwnProperty(s.player.uuid)) {
+          delete this.seatedmap[s.player.uuid];
+        }
+      });
+      delete this.tablesmap[table.uuid];
+    }
     this.changes.detectChanges();
   }
 

@@ -19,5 +19,8 @@ export class FantascattiService {
     return this.http.post<TableDto>(environment.server + '/fantascatti/' + table.uuid + '/' + player.uuid +  '/pick', piece);
   }
 
+  quitGame(table: TableDto, player: PlayerDto) {
+    return this.http.post<TableDto>(environment.server + '/fantascatti/' + table.uuid + '/quit', player);
+  }
 
 }

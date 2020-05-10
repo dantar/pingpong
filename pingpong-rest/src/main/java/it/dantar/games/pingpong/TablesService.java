@@ -54,12 +54,6 @@ public class TablesService {
 				.getEmitter();
 	}
 
-	public SseEmitter newTableSse(String uuid) {
-		return tables.get(uuid)
-				.setEmitter(new SseEmitter(TIMEOUT))
-				.getEmitter();
-	}
-
 	public void broadcastMessage(SseDto message) {
 		broadcastMessageToPlayers(message, players.values().stream());
 	}
@@ -123,7 +117,12 @@ public class TablesService {
 	public TableDto getTable(String uuid) {
 		return this.tables.get(uuid).getDto();
 	}
-	
+
+	public void removeTable(TableDto table) {
+		this.owners.remove(table.getOwner().getUuid());
+		this.tables.remove(table.getUuid());
+	}
+
 	public PlayerDto getPlayer(String uuid) {
 		return this.players.get(uuid).getDto();
 	}

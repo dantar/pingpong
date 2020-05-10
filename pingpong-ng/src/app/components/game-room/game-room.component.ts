@@ -4,7 +4,8 @@ import { TableDto, PlayerDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
 import { environment } from 'src/environments/environment';
 import { MessageDto } from 'src/app/models/operations-dto.model';
-import { FantascattiSseDto, NewPlayerDto, PlayerReadyDto, NewGuessDto, FantascattiCardDto, FantascattiPiece, PlayerPicksPieceDto } from 'src/app/models/fantascatti.model';
+import { FantascattiSseDto, NewPlayerDto, PlayerReadyDto, NewGuessDto, FantascattiCardDto, 
+  FantascattiPiece, PlayerPicksPieceDto, PlayerQuitDto } from 'src/app/models/fantascatti.model';
 import { SharedDataService } from 'src/app/services/shared-data.service';
 import { FantascattiService } from 'src/app/services/fantascatti.service';
 
@@ -24,8 +25,6 @@ export class GameRoomComponent implements OnInit {
     private router: Router,
   ) { }
 
-  dragonfill = '#ffff00';
-
   table: TableDto;
   guess: FantascattiCardDto;
 
@@ -34,8 +33,6 @@ export class GameRoomComponent implements OnInit {
   players: PlayerDto[];
   ready: string[];
   score: {[id: string]: number};
-  color: {[id: string]: string};
-  colors: string[];
   mypick: FantascattiPiece;
   moves: PlayerPicksPieceDto[];
 
@@ -69,13 +66,11 @@ export class GameRoomComponent implements OnInit {
       'yellow': '#806600',
       'green': '#008000',
     }
-    this.colors = ['#ff9400', '#ff4600', '#ff0039', '#ff00c2', '#d300ff', '#7b00ff', '#1500ff', '#0084ff', '#00ceff', '#00ffde', '#00ff1b', '#e1ff00'];
     this.piecesmap = {};
     this.pieces.forEach(p => {
       this.piecesmap[p.shape] = p;
     });
     this.score = {};
-    this.color = {};
     this.moves = [];
     this.players = [];    
     this.resetTurn();
@@ -86,7 +81,6 @@ export class GameRoomComponent implements OnInit {
       this.players.push(...table.seats.map(s=>s.player)); // array spread operator!
       this.players.forEach(p => {
         this.score[p.uuid] = 0;
-        this.color[p.uuid] = this.colors.splice(0, 1)[0];
       })
     });
   }
@@ -110,7 +104,10 @@ export class GameRoomComponent implements OnInit {
         this.onNewGuess(dto as NewGuessDto);
         break;
       case PlayerPicksPieceDto.CODE:
-        this.onPlayerPicksPiece(dto as PlayerPicksPieceDto)
+        this.onPlayerPicksPiece(dto as PlayerPicksPieceDto);
+        break;
+      case PlayerQuitDto.CODE:
+        this.onPlayerQuit(dto as PlayerQuitDto);
         break;
       default:
         console.log('cannot handle event', dto);
@@ -150,12 +147,22 @@ export class GameRoomComponent implements OnInit {
     }
     this.changes.detectChanges();
   }
+  onPlayerQuit(dto: PlayerQuitDto) {
+    if (dto.player.uuid === this.table.owner.uuid) {
+      this.router.navigate(['tables']);
+    }
+    // ready score moves
+    if (this.ready.includes(dto.player.uuid)) this.ready.splice(this.ready.indexOf(dto.player.uuid), 1);
+    delete this.score[dto.player.uuid];
+    this.moves = this.moves.filter(m => m.player.uuid!==dto.player.uuid);
+    this.changes.detectChanges();
+  }
 
   resetTurn() {
     this.state = 'wait-for-ready';
     this.ready = [];
     this.mypick = null;
-}
+  }
 
   iAmReady() {
     if (this.ready.includes(this.shared.player.uuid)) return;
@@ -165,6 +172,16 @@ export class GameRoomComponent implements OnInit {
     this.fantascatti.playerReady(this.table, this.shared.player).subscribe(
       // loading? 
     );
+  }
+
+  iQuit() {
+    this.fantascatti.quitGame(this.table, this.shared.player).subscribe(r => {
+      this.router.navigate(['tables']);
+    });
+  }
+
+  clickPlayer(player: PlayerDto) {
+    if (player.uuid === this.shared.player.uuid) this.iQuit();
   }
 
   pick(piece: FantascattiPiece) {

@@ -16,8 +16,14 @@ public class FantascattiController {
 	FantascattiService fantascattiService;
 
 	@PostMapping("/fantascatti/{uuid}/ready")
-	public PlayerDto postTable(@PathVariable String uuid, @RequestBody PlayerDto player) {
+	public PlayerDto postReady(@PathVariable String uuid, @RequestBody PlayerDto player) {
 		fantascattiService.playerReady(uuid, player);
+		return player;
+	}
+
+	@PostMapping("/fantascatti/{uuid}/quit")
+	public PlayerDto postQuit(@PathVariable String uuid, @RequestBody PlayerDto player) {
+		fantascattiService.playerQuit(uuid, player);
 		return player;
 	}
 

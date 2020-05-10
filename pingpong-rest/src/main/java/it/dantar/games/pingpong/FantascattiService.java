@@ -1,6 +1,7 @@
 package it.dantar.games.pingpong;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import it.dantar.games.pingpong.dto.FantascattiCardDto;
 import it.dantar.games.pingpong.dto.FantascattiNewGuessSseDto;
 import it.dantar.games.pingpong.dto.FantascattiPlayerPicksPieceSseDto;
+import it.dantar.games.pingpong.dto.FantascattiPlayerQuitSseDto;
 import it.dantar.games.pingpong.dto.FantascattiPlayerReadySseDto;
 import it.dantar.games.pingpong.dto.PlayerDto;
 import it.dantar.games.pingpong.dto.TableDto;
@@ -108,6 +110,26 @@ public class FantascattiService {
 		game.getReady().clear();
 		game.setGuess(randomGuess());
 		tablesService.broadcastMessageToTable(gameId, new FantascattiNewGuessSseDto().setGuess(game.getGuess()));			
+	}
+
+	public void playerQuit(String uuid, PlayerDto player) {
+		FantascattiGame game = this.games.get(uuid);
+		TableDto table = this.tablesService.getTable(game.getTableId());
+		if (table.getOwner().getUuid().equals(player.getUuid())) {
+			// remove game altogether
+			this.games.remove(uuid);
+			this.tablesService.removeTable(table);
+		} else {
+			// update game
+			_removePlayerFromSet(player.getUuid(), game.getPicks());
+			_removePlayerFromSet(player.getUuid(), game.getReady());
+			if (game.getScore().containsKey(player.getUuid())) game.getScore().remove(player.getUuid());
+		}
+		tablesService.broadcastMessage(new FantascattiPlayerQuitSseDto().setPlayer(player));
+	}
+
+	private void _removePlayerFromSet(String uuid, Collection<String> uuids) {
+		if (uuid.contains(uuid)) uuids.remove(uuid);
 	}
 	
 }
