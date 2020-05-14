@@ -44,7 +44,10 @@ export class GameRoomComponent implements OnInit, OnDestroy {
   pieces: FantascattiPiece[];
   piecesmap: {[shape:string]: FantascattiPiece};
 
+  quitting: boolean;
+
   ngOnInit(): void {
+    this.quitting = false;
     this.pieces = [
       {shape: 'dragon', color: 'red'},
       {shape: 'chest', color: 'brown'},
@@ -99,6 +102,7 @@ export class GameRoomComponent implements OnInit, OnDestroy {
     } else {
       console.log("destroy SSE", this);
     }
+    this.iQuit();
   }
   messageEventListener = (
     message => {
@@ -192,9 +196,12 @@ export class GameRoomComponent implements OnInit, OnDestroy {
   }
 
   iQuit() {
-    this.fantascatti.quitGame(this.table, this.shared.player).subscribe(r => {
-      this.router.navigate(['tables']);
-    });
+    if (!this.quitting) {
+      this.fantascatti.quitGame(this.table, this.shared.player).subscribe(r => {
+        this.router.navigate(['tables']);
+      });
+    }
+    this.quitting = true;
   }
 
   clickPlayer(player: PlayerDto) {

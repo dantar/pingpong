@@ -16,7 +16,7 @@
     </div>
 
     <div *ngIf="shared.player && shared.sse && !shared.connected">
-      Connessione in corso... <span (click)="refresh!">attendi!</span>
+      Connessione in corso... <span (click)="refresh()">attendi!</span>
     </div>
 
   </div>
@@ -24,6 +24,9 @@
   <router-outlet *ngIf="shared.player && shared.sse"></router-outlet>
   
   <div class="panel-menu-list bottom-right-menu">
+    <div class="svg-button" (click)="sendHello()">
+      <app-svg-button text="Hello!"></app-svg-button>
+    </div>
     <div class="svg-button">
       <app-fullscreen-toggle></app-fullscreen-toggle>
     </div>

@@ -48,4 +48,8 @@ export class RestService {
     return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + '/start', {});
   }
 
+  hello() {
+    return this.http.get<TableDto>(environment.server + '/hello');
+  }
+
 }
