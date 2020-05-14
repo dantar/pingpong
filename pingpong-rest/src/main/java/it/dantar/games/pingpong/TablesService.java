@@ -49,6 +49,9 @@ public class TablesService {
 			player = new Player().setDto(new PlayerDto().setUuid(uuid));
 			this.players.put(uuid, player);
 		}
+		if (player.getEmitter() != null) {
+			player.getEmitter().complete();
+		}
 		return player
 				.setEmitter(new SseEmitter(TIMEOUT))
 				.getEmitter();
@@ -101,9 +104,12 @@ public class TablesService {
 			this.players.put(player.getDto().getUuid(), player);			
 		} else {
 			player = this.players.get(dto.getUuid());
-			if (player == null) {
-				this.players.put(dto.getUuid(), new Player().setDto(dto));
+			if (player != null) {
+				if (player.getEmitter() != null) {
+					player.getEmitter().complete();
+				}
 			}
+			this.players.put(dto.getUuid(), new Player().setDto(dto));
 		}
 	}
 

@@ -15,7 +15,7 @@ export class PlayerAvatarComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    if (!this.name) this.name = this.player.name;
+    if (!this.name) this.name = this.player.name ? this.player.name : '?';
     if (!this.glyph) this.glyph = this.name.length > 0 ? this.name[0] : '';
   }
 

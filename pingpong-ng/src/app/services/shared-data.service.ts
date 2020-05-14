@@ -32,9 +32,9 @@ export class SharedDataService {
     })
     this.sse.addEventListener('error', error => {
       console.log(this, 'error', error);
-      this.sse.close();
-      this.sse = null;
-      this.connected = false;
+      //this.sse.close();
+      //this.sse = null;
+      //this.connected = false;
     })
     this.sse.addEventListener('message', message => {
       console.log(this, 'message', message);

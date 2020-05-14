@@ -171,6 +171,10 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     this.changes.detectChanges();
   }
   onSseRegisterPlayer(dto: RegisterPlayerDto) {
+    const ids = this.players.map(p => p.uuid);
+    if (ids.includes(dto.player.uuid)) {
+      this.players.splice(ids.indexOf(dto.player.uuid), 1);
+    }
     this.players.push(dto.player);
     this.changes.detectChanges();
   }
