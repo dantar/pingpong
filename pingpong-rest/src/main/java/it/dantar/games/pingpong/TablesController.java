@@ -16,6 +16,7 @@ import it.dantar.games.pingpong.dto.AvailableTableSseDto;
 import it.dantar.games.pingpong.dto.PlayerDto;
 import it.dantar.games.pingpong.dto.RegisterPlayerSseDto;
 import it.dantar.games.pingpong.dto.SeatDto;
+import it.dantar.games.pingpong.dto.SituationDto;
 import it.dantar.games.pingpong.dto.SseDto;
 import it.dantar.games.pingpong.dto.TableDto;
 import it.dantar.games.pingpong.dto.TablePlayerAcceptSseDto;
@@ -105,19 +106,12 @@ public class TablesController {
 		return table;
 	}
 
-	@GetMapping("/players")
-	public List<PlayerDto> getPlayers() {
-		return pingpongService.listPlayers();
-	}
-
-	@GetMapping("/tables/{playerId}")
-	public List<TableDto> getTables(@PathVariable String playerId) {
-		return pingpongService.listPlayerTables(playerId);
-	}
-
-	@GetMapping("/tables")
-	public List<TableDto> getAllTables() {
-		return pingpongService.listAllTables();
+	@GetMapping("/situation")
+	public SituationDto getSituation() {
+		return new SituationDto()
+				.setPlayers(pingpongService.listPlayers())
+				.setTables(pingpongService.listAllTables())
+				;
 	}
 
 	@PostMapping("/table/{tableId}/start")

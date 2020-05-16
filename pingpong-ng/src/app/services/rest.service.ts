@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PlayerDto, TableDto, SeatDto } from '../models/player.model';
+import { PlayerDto, TableDto, SituationDto } from '../models/player.model';
 import { Observable } from 'rxjs';
 import { OpResult } from '../models/operations-dto.model';
 import { environment } from 'src/environments/environment';
@@ -27,19 +27,11 @@ export class RestService {
     const action = accept ? '/accept' : '/reject';
     return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + action, player);
   }
+
+  situation(): Observable<SituationDto> {
+    return this.http.get<SituationDto>(environment.server + '/situation');
+  }
   
-  players(): Observable<PlayerDto[]> {
-    return this.http.get<PlayerDto[]>(environment.server + '/players');
-  }
-
-  tables(player: PlayerDto): Observable<TableDto[]> {
-    return this.http.get<TableDto[]>(environment.server + '/tables/' + player.uuid);
-  }
-
-  allTables(): Observable<TableDto[]> {
-    return this.http.get<TableDto[]>(environment.server + '/tables');
-  }
-
   table(uuid: string): Observable<TableDto> {
     return this.http.get<TableDto>(environment.server + '/table/' + uuid);
   }

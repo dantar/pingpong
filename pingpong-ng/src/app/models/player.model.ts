@@ -1,9 +1,12 @@
-export class PlayerDto {
+export class SituationDto {
+    players: PlayerDto[];
+    tables: TableDto[];
+}
 
+export class PlayerDto {
     name: string;
     uuid?: string;
     avatar: AvatarDto;
-
 }
 
 export class AvatarDto {
@@ -11,11 +14,9 @@ export class AvatarDto {
 }
 
 export class TableDto {
-
     uuid?: string;
     seats: SeatDto[];
     owner: PlayerDto;
-
 }
 
 export class SeatDto {

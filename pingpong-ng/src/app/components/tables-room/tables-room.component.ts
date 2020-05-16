@@ -34,28 +34,10 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     this.players = null;
     this.tables = null;
     this.initSse();
-    this.initTables();
-    this.initPlayers();
+    this.initSituation();
   }
   ngOnDestroy(): void {
     this.destroySse();
-  }
-
-  initTables() {
-    this.tablesmap = {};
-    this.ownership = {};
-    this.seatedmap = {};
-    this.rest.allTables().subscribe(tables => {
-      this.tables = tables;
-      this.tables.forEach(t=> {
-        this.tablesmap[t.uuid] = t;
-        this.ownership[t.owner.uuid] = t;
-        this.seatedmap[t.owner.uuid] = t;
-        t.seats.forEach(s => {
-          this.seatedmap[s.player.uuid] = t;
-        });
-      });
-    });
   }
 
   dropTable(table: TableDto) {
@@ -80,10 +62,34 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     }    
   );
 
-  initPlayers() {
-    this.rest.players().subscribe(players=> {
-      this.players = players.filter(p => p.uuid != this.shared.player.uuid);
+  initSituation() {
+    this.players = [];
+    this.tablesmap = {};
+    this.ownership = {};
+    this.seatedmap = {};
+    this.rest.situation().subscribe(situation => {
+      console.log(this, 'situation', situation);
+      this._initPlayers(situation.players);
+      this._initTables(situation.tables);
     });
+  }
+  _initTables(tables: TableDto[]) {
+    this.tables = tables;
+    this.tables.forEach(t=> {
+      this.tablesmap[t.uuid] = t;
+      this.ownership[t.owner.uuid] = t;
+      this.seatedmap[t.owner.uuid] = t;
+      if (t.owner.uuid === this.shared.player.uuid) this.mytable = t;
+      t.seats.forEach(s => {
+        this.seatedmap[s.player.uuid] = t;
+        if (s.player.uuid === this.shared.player.uuid) {
+          this.mytable = t;
+        }
+      });
+    });
+  }
+  _initPlayers(players: PlayerDto[]) {
+    this.players = players.filter(p => p.uuid != this.shared.player.uuid);
   }
 
   onSseEvent(dto: SseDto) {
@@ -168,6 +174,17 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
   onSseStalePlayers(dto: StalePlayersDto) {
     const stale = dto.players.map(p=>p.uuid);
     this.players = this.players.filter(p=>!stale.includes(p.uuid));
+    if (this.mytable) {
+      const seatstodrop = this.mytable.seats.filter(s => stale.includes(s.player.uuid));
+      seatstodrop.forEach(s => this.mytable.seats.splice(this.mytable.seats.indexOf(s), 1));
+    }
+    dto.players.forEach(p => {
+      if (this.seatedmap.hasOwnProperty(p.uuid)) delete this.seatedmap[p.uuid];
+      if (this.ownership.hasOwnProperty(p.uuid)) {
+        if (this.tablesmap.hasOwnProperty(this.ownership[p.uuid].uuid)) delete this.tablesmap[this.ownership[p.uuid].uuid];
+        delete this.ownership[p.uuid];
+      }
+    });
     this.changes.detectChanges();
   }
   onSseRegisterPlayer(dto: RegisterPlayerDto) {

@@ -137,20 +137,6 @@ public class TablesService {
 				.collect(Collectors.toList());
 	}
 
-	public List<TableDto> listPlayerTables(String playerId) {
-		return this.tables.entrySet().stream()
-				.map(entry -> entry.getValue().getDto())
-				.filter(t -> {
-					if (t.getOwner().getUuid().equals(playerId)) return true;
-					for (SeatDto seatDto : t.getSeats()) {
-						if (seatDto.getOpen()) return true;
-						if (seatDto.getPlayer() != null && seatDto.getPlayer().getUuid().equals(playerId)) return true; 
-					}
-					return false;
-				})
-				.collect(Collectors.toList());
-	}
-
 	public void broadcastMessageToTable(TableDto tableDto, SseDto message) {
 		String tableId = tableDto.getUuid();
 		broadcastMessageToTable(tableId, message);
