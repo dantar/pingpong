@@ -1,11 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SharedDataService } from 'src/app/services/shared-data.service';
-import { PlayerDto, TableDto, SeatDto } from 'src/app/models/player.model';
+import { PlayerDto, TableDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
 import { MessageDto as SseDto, RegisterPlayerDto, StalePlayersDto, AvailableTableDto,
   TablePlayerAcceptSseDto, TablePlayerInvitationSseDto, TableStartSseDto } from 'src/app/models/operations-dto.model';
-import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { PlayerQuitDto } from 'src/app/models/fantascatti.model';
 
@@ -23,7 +22,6 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     private router: Router) { }
 
   players: PlayerDto[];
-  tables: TableDto[];
   tablesmap: {[id:string]: TableDto};
   ownership: {[id:string]: TableDto};
   seatedmap: {[id:string]: TableDto};
@@ -32,7 +30,6 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.players = null;
-    this.tables = null;
     this.initSse();
     this.initSituation();
   }
@@ -74,8 +71,7 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     });
   }
   _initTables(tables: TableDto[]) {
-    this.tables = tables;
-    this.tables.forEach(t=> {
+    tables.forEach(t=> {
       this.tablesmap[t.uuid] = t;
       this.ownership[t.owner.uuid] = t;
       this.seatedmap[t.owner.uuid] = t;
@@ -126,12 +122,6 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     this.changes.detectChanges();
   }
   onSseTablePlayerInvitation(dto: TablePlayerInvitationSseDto) {
-    const index = this.tables.indexOf(this.tablesmap[dto.table.uuid]);
-    if (index === -1) {
-      this.tables.push(dto.table);
-    } else {
-      this.tables.splice(index, 1, dto.table);
-    }
     this.tablesmap[dto.table.uuid] = dto.table;
     this.ownership[dto.table.owner.uuid] = dto.table;
     this.seatedmap[dto.player.uuid] = dto.table;
@@ -142,12 +132,6 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     this.changes.detectChanges();
   }
   onSseTablePlayerAccept(dto: TablePlayerAcceptSseDto) {
-    const index = this.tables.indexOf(this.tablesmap[dto.table.uuid]);
-    if (index === -1) {
-      this.tables.push(dto.table);
-    } else {
-      this.tables.splice(index, 1, dto.table);
-    }
     this.tablesmap[dto.table.uuid] = dto.table;
     this.ownership[dto.table.owner.uuid] = dto.table;
     if (!dto.accepted) {
@@ -162,7 +146,6 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     this.changes.detectChanges();
   }
   onSseAvailableTable(dto: AvailableTableDto) {
-    this.tables.push(dto.table);
     this.tablesmap[dto.table.uuid] = dto.table;
     this.ownership[dto.table.owner.uuid] = dto.table;
     this.seatedmap[dto.table.owner.uuid] = dto.table;
@@ -188,9 +171,18 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     this.changes.detectChanges();
   }
   onSseRegisterPlayer(dto: RegisterPlayerDto) {
-    if (dto.table.uuid == this.mytable.uuid) {
-      console.log('Player at my table: update table');
-      this.mytable = dto.table;
+    if (dto.table) {
+      if (dto.table.owner.uuid === dto.player.uuid) {
+        console.log('Player owns table');
+        this.ownership[dto.player.uuid] = dto.table;
+      } else {
+        console.log('Player seats at table');
+        this.seatedmap[dto.player.uuid] = dto.table;
+      }
+      if (this.mytable && dto.table.uuid == this.mytable.uuid) {
+        console.log('Player at my table: update table');
+        this.mytable = dto.table;      
+      }
     }
     if (dto.player.uuid === this.shared.player.uuid) {
       console.log('Skip my own registration');
@@ -262,9 +254,6 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     this.rest.acceptInvitation(table, this.shared.player, accept).subscribe(t => {
       console.log(t);
     });
-    if (! accept) {
-      this.tables.splice(this.tables.indexOf(table), 1);
-    }
   }
 
   tableAvailablePlayers(table: TableDto): PlayerDto[] {
