@@ -99,7 +99,7 @@ public class TablesService {
 			table = this.seats.get(player.getUuid());
 		this.broadcastMessage(new RegisterPlayerSseDto()
 				.setPlayer(player)
-				.setTable(table.getDto())
+				.setTable(table == null? null : table.getDto())
 				);
 	}
 
