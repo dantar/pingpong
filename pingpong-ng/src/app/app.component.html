@@ -5,7 +5,7 @@
     <div *ngIf="shared.player">Player</div>
     <div *ngIf="!shared.player">!Player</div>
     
-    <div *ngIf="shared.sse">SSE</div>
+    <div *ngIf="shared.sse">SSE status {{shared.sse.readyState}}</div>
     <div *ngIf="!shared.sse">!SSE</div>
     
     <div *ngIf="!shared.player && !shared.sse">
@@ -16,7 +16,15 @@
     </div>
 
     <div *ngIf="shared.player && shared.sse && !shared.connected">
-      Connessione in corso... <span (click)="refresh()">attendi!</span>
+      <div *ngIf="shared.sse.readyState === 0">
+        Connessione in corso... <span class="inline-button" (click)="refresh()">attendi</span>
+      </div>
+      <div *ngIf="shared.sse.readyState === 1">
+        Connessione aperta <span class="inline-button" (click)="refresh()">ricarica</span>
+      </div>
+      <div *ngIf="shared.sse.readyState === 2">
+        Connessione terminata <span class="inline-button" (click)="shared.reconnect()">riconnetti</span>
+      </div>
     </div>
 
   </div>

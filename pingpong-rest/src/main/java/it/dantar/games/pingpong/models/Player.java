@@ -8,6 +8,7 @@ public class Player {
 
 	PlayerDto dto;
 	SseEmitter emitter;
+	Boolean ack = false;
 	
 	public PlayerDto getDto() {
 		return dto;
@@ -21,6 +22,13 @@ public class Player {
 	}
 	public Player setEmitter(SseEmitter emitter) {
 		this.emitter = emitter;
+		return this;
+	}
+	public Boolean getAck() {
+		return ack;
+	}
+	public Player setAck(Boolean ack) {
+		this.ack = ack;
 		return this;
 	}
 	

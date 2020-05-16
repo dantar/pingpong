@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,9 +21,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import it.dantar.games.pingpong.dto.DroppedStalePlayerSseDto;
 import it.dantar.games.pingpong.dto.PlayerDto;
+import it.dantar.games.pingpong.dto.RegisterPlayerSseDto;
 import it.dantar.games.pingpong.dto.SeatDto;
 import it.dantar.games.pingpong.dto.SseDto;
+import it.dantar.games.pingpong.dto.SseStatusDto;
 import it.dantar.games.pingpong.dto.TableDto;
+import it.dantar.games.pingpong.dto.TablePlayerAcceptSseDto;
+import it.dantar.games.pingpong.dto.TablePlayerInvitationSseDto;
 import it.dantar.games.pingpong.models.Player;
 import it.dantar.games.pingpong.models.Table;
 
@@ -37,18 +42,39 @@ public class TablesService {
 	Map<String, Player> players = new HashMap<String, Player>();
 	Map<String, Table> tables = new HashMap<String, Table>();
 	Map<String, Table> owners = new HashMap<String, Table>();
+	Map<String, Table> seats = new HashMap<String, Table>();
 	
 	static final long TIMEOUT = 1000*60*60*4L;
 	
 	@Autowired
 	FantascattiService fantascattiService;
 
-	public SseEmitter newPlayerSse(String uuid) {
+	public void register(PlayerDto dto) {
+		Player player;
+		if (dto.getUuid() == null || dto.getUuid().isEmpty()) {
+			player = new Player().setDto(dto
+					.setUuid(UUID.randomUUID().toString()));
+		} else {
+			player = this.players.get(dto.getUuid());
+			if (player != null && player.getEmitter() != null) {
+				player.getEmitter().complete();
+			}
+			player = new Player().setDto(dto);
+		}
+		this.players.put(player.getDto().getUuid(), player);			
+	}
+
+	public SseEmitter requestPlayerSse(String uuid) {
 		Player player = players.get(uuid);
 		if (player == null) {
-			player = new Player().setDto(new PlayerDto().setUuid(uuid));
+			// reconnection attempt on an unknown player
+			player = new Player();
 			this.players.put(uuid, player);
 		}
+		return requestPlayerSse(player);
+	}
+
+	private SseEmitter requestPlayerSse(Player player) {
 		if (player.getEmitter() != null) {
 			player.getEmitter().complete();
 		}
@@ -57,12 +83,33 @@ public class TablesService {
 				.getEmitter();
 	}
 
+	public SseStatusDto statusPlayerSse(String uuid) {
+		return new SseStatusDto();
+	}
+
+	public void ackPlayerSse(PlayerDto player) {
+		// confirms or sets player dto
+		this.players.get(player.getUuid()).setDto(player);
+		okRegisteredPlayer(player);
+	}
+
+	private void okRegisteredPlayer(PlayerDto player) {
+		TableDto table = this.owners.get(player.getUuid()).getDto();
+		if (table == null)
+			table = this.seats.get(player.getUuid()).getDto();
+		this.broadcastMessage(new RegisterPlayerSseDto()
+				.setPlayer(player)
+				.setTable(table)
+				);
+	}
+
 	public void broadcastMessage(SseDto message) {
 		broadcastMessageToPlayers(message, players.values().stream());
 	}
 
 	private void broadcastMessageToPlayers(SseDto message, Stream<Player> streamOfPlayers) {
 		Set<Player> stale = new HashSet<>();
+		Set<Player> sent = new HashSet<>();
 		streamOfPlayers.forEach(player -> {
 			SseEmitter emitter = player.getEmitter();
 			if (emitter == null) return;
@@ -70,15 +117,16 @@ public class TablesService {
 				emitter.send(SseEmitter.event()
 						.data(message, MediaType.APPLICATION_JSON)
 						);
-				Logger.getLogger(this.getClass().getName()).info(String.format("Sse sent to %s", player.getDto().getUuid()));
+				sent.add(player);
 			} catch (IOException | IllegalStateException e) {
-				Logger.getLogger(this.getClass().getName()).info(String.format("Stale emitter: %s", player.getDto().getUuid()));
 				emitter.completeWithError(e);
 				player.setEmitter(null);
 				stale.add(player);
 			}
 		});
+		Logger.getLogger(this.getClass().getName()).info(String.format("Sse %s sent to %s players", message.getCode(), sent.size()));
 		if (stale.size() > 0) {
+			Logger.getLogger(this.getClass().getName()).info(String.format("Stale emitters: %s", stale.size()));
 			stale.forEach(player -> {
 				String playerUuid = player.getDto().getUuid();
 				Table table = this.owners.get(playerUuid);
@@ -94,21 +142,6 @@ public class TablesService {
 							.map(player -> player.getDto())
 							.collect(Collectors.toList())));
 		}
-	}
-
-	public void register(PlayerDto dto) {
-		Player player;
-		if (dto.getUuid() == null || dto.getUuid().isEmpty()) {
-			player = new Player().setDto(dto
-					.setUuid(UUID.randomUUID().toString()));
-		} else {
-			player = this.players.get(dto.getUuid());
-			if (player != null && player.getEmitter() != null) {
-				player.getEmitter().complete();
-			}
-			player = new Player().setDto(dto);
-		}
-		this.players.put(player.getDto().getUuid(), player);			
 	}
 
 	public void newTable(TableDto table) {
@@ -168,6 +201,48 @@ public class TablesService {
 		return this.tables.entrySet().stream()
 				.map(entry -> entry.getValue().getDto())
 				.collect(Collectors.toList());
+	}
+
+	public TableDto tablePlayerAccept(String gameId, PlayerDto player) {
+		TableDto table = getTable(gameId);
+		table.getSeats().stream()
+		.filter(s -> s.getPlayer()!=null)
+		.collect(Collectors.toMap(s->s.getPlayer().getUuid(), Function.identity()))
+		.get(player.getUuid())
+		.setPending(false);
+		broadcastMessage(new TablePlayerAcceptSseDto()
+				.setTable(table)
+				.setPlayer(player)
+				.setAccepted(true));
+		return table;
+	}
+
+	public TableDto tablePlayerReject(String gameId, PlayerDto player) {
+		TableDto table = getTable(gameId);
+		SeatDto seat = table.getSeats().stream()
+		.filter(s -> s.getPlayer()!=null)
+		.collect(Collectors.toMap(s->s.getPlayer().getUuid(), Function.identity()))
+		.get(player.getUuid());
+		table.getSeats().remove(seat);
+		seats.remove(player.getUuid());
+		broadcastMessage(new TablePlayerAcceptSseDto()
+				.setTable(table)
+				.setPlayer(player)
+				.setAccepted(false));
+		return table;
+	}
+
+	public TableDto tablePlayerInvitation(String gameId, PlayerDto player) {
+		seats.put(player.getUuid(), this.tables.get(gameId));
+		TableDto table = getTable(gameId).addSeat(new SeatDto()
+				.setOpen(false)
+				.setPending(true)
+				.setPlayer(player)
+				);
+		broadcastMessage(new TablePlayerInvitationSseDto()
+				.setTable(table)
+				.setPlayer(player));
+		return table;
 	}
 
 }

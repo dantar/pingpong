@@ -16,6 +16,7 @@ export class RegisterPlayerDto extends MessageDto {
     static CODE = 'register-player';
     code = RegisterPlayerDto.CODE;
     player: PlayerDto;
+    table: TableDto;
 }
 
 export class StalePlayersDto extends MessageDto {

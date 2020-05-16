@@ -16,6 +16,11 @@
     }
 }
 
+.inline-button {
+    user-select: none;
+    font-weight: 700;
+}
+
 .my-table{
     .my-avatar svg {
         height: 80px;

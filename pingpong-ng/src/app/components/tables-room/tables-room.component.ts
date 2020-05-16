@@ -188,6 +188,10 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     this.changes.detectChanges();
   }
   onSseRegisterPlayer(dto: RegisterPlayerDto) {
+    if (dto.table.uuid == this.mytable.uuid) {
+      console.log('Player at my table: update table');
+      this.mytable = dto.table;
+    }
     if (dto.player.uuid === this.shared.player.uuid) {
       console.log('Skip my own registration');
       return;

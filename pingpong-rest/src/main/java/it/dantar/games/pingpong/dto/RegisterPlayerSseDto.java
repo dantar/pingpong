@@ -8,6 +8,7 @@ public class RegisterPlayerSseDto extends SseDto {
 	}
 
 	PlayerDto player;
+	TableDto table;
 
 	public PlayerDto getPlayer() {
 		return player;
@@ -16,6 +17,12 @@ public class RegisterPlayerSseDto extends SseDto {
 		this.player = player;
 		return this;
 	}
-	
+	public TableDto getTable() {
+		return table;
+	}
+	public RegisterPlayerSseDto setTable(TableDto table) {
+		this.table = table;
+		return this;
+	}
 	
 }
