@@ -67,9 +67,7 @@ public class TablesService {
 	public SseEmitter requestPlayerSse(String uuid) {
 		Player player = players.get(uuid);
 		if (player == null) {
-			// reconnection attempt on an unknown player
-			player = new Player();
-			this.players.put(uuid, player);
+			return null;
 		}
 		return requestPlayerSse(player);
 	}
@@ -88,12 +86,6 @@ public class TablesService {
 	}
 
 	public void ackPlayerSse(PlayerDto player) {
-		// confirms or sets player dto
-		this.players.get(player.getUuid()).setDto(player);
-		okRegisteredPlayer(player);
-	}
-
-	private void okRegisteredPlayer(PlayerDto player) {
 		Table table = this.owners.get(player.getUuid());
 		if (table == null)
 			table = this.seats.get(player.getUuid());
