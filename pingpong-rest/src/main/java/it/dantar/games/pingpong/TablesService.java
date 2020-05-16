@@ -94,12 +94,12 @@ public class TablesService {
 	}
 
 	private void okRegisteredPlayer(PlayerDto player) {
-		TableDto table = this.owners.get(player.getUuid()).getDto();
+		Table table = this.owners.get(player.getUuid());
 		if (table == null)
-			table = this.seats.get(player.getUuid()).getDto();
+			table = this.seats.get(player.getUuid());
 		this.broadcastMessage(new RegisterPlayerSseDto()
 				.setPlayer(player)
-				.setTable(table)
+				.setTable(table.getDto())
 				);
 	}
 
