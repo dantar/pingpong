@@ -25,8 +25,13 @@ export class SharedDataService {
   }
 
   initSse() {
-    this.sse = new EventSource(environment.server + '/sse/' + this.player.uuid);
+    this.sse = new EventSource(environment.server + '/sse/request/' + this.player.uuid);
     this.sse.addEventListener('open', open => {
+      if (!this.connected) {
+        this.rest.ackSse(this.player).subscribe(player => {
+          console.log('ack', player);
+        });
+      }
       this.connected = true;
       console.log(this, 'open', open);
     })
@@ -34,13 +39,13 @@ export class SharedDataService {
       console.log(this, 'error', error);
       //this.sse.close();
       //this.sse = null;
-      //this.connected = false;
+      this.connected = false;
     })
     this.sse.addEventListener('message', message => {
       console.log(this, 'message', message);
     })
   }
- 
+
   setPlayer(player: PlayerDto) {
     this.player = player;
     if (environment.store) {

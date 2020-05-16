@@ -171,10 +171,16 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     this.changes.detectChanges();
   }
   onSseRegisterPlayer(dto: RegisterPlayerDto) {
+    if (dto.player.uuid === this.shared.player.uuid) {
+      console.log('Skip my own registration');
+      return;
+    }
     const ids = this.players.map(p => p.uuid);
     if (ids.includes(dto.player.uuid)) {
+      console.log('I already knew this player: drop old version');
       this.players.splice(ids.indexOf(dto.player.uuid), 1);
     }
+    console.log('Included player', dto.player);
     this.players.push(dto.player);
     this.changes.detectChanges();
   }

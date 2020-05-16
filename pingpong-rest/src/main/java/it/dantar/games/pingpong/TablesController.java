@@ -28,11 +28,17 @@ public class TablesController {
 	@Autowired
 	TablesService pingpongService;
 
-	@GetMapping("/sse/{uuid}")
+	@GetMapping("/sse/request/{uuid}")
 	public SseEmitter playerSse(@PathVariable String uuid) {
 		return pingpongService.newPlayerSse(uuid);
 	}
 
+	@PostMapping("/sse/ack")
+	public PlayerDto confirmSse(@RequestBody PlayerDto player) {
+		pingpongService.broadcastMessage(new RegisterPlayerSseDto().setPlayer(player));
+		return player;
+	}
+	
 	@GetMapping("/hello")
 	public void joinGame() {
 		pingpongService.broadcastMessage(new SseDto().setCode("hello"));
@@ -41,7 +47,6 @@ public class TablesController {
 	@PostMapping("/register")
 	public PlayerDto register(@RequestBody PlayerDto player) {
 		this.pingpongService.register(player);
-		pingpongService.broadcastMessage(new RegisterPlayerSseDto().setPlayer(player));
 		return player;
 	}
 

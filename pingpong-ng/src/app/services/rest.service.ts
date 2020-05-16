@@ -52,4 +52,8 @@ export class RestService {
     return this.http.get<TableDto>(environment.server + '/hello');
   }
 
+  ackSse(player: PlayerDto) {
+    return this.http.post<TableDto>(environment.server + '/sse/ack', player);
+  }
+
 }

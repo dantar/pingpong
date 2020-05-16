@@ -101,16 +101,14 @@ public class TablesService {
 		if (dto.getUuid() == null || dto.getUuid().isEmpty()) {
 			player = new Player().setDto(dto
 					.setUuid(UUID.randomUUID().toString()));
-			this.players.put(player.getDto().getUuid(), player);			
 		} else {
 			player = this.players.get(dto.getUuid());
-			if (player != null) {
-				if (player.getEmitter() != null) {
-					player.getEmitter().complete();
-				}
+			if (player != null && player.getEmitter() != null) {
+				player.getEmitter().complete();
 			}
-			this.players.put(dto.getUuid(), new Player().setDto(dto));
+			player = new Player().setDto(dto);
 		}
+		this.players.put(player.getDto().getUuid(), player);			
 	}
 
 	public void newTable(TableDto table) {
