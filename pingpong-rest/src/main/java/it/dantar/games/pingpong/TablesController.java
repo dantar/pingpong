@@ -59,6 +59,11 @@ public class TablesController {
 		return this.pingpongService.getTable(uuid);
 	}
 
+	@PostMapping("/table/{gameId}/drop")
+	public TableDto postTableDrop(@PathVariable String gameId) {
+		return this.pingpongService.tableDrop(gameId);
+	}
+
 	@PostMapping("/table/{gameId}/invite")
 	public TableDto postTablePlayerInvitation(@PathVariable String gameId, @RequestBody PlayerDto player) {
 		return this.pingpongService.tablePlayerInvitation(gameId, player);

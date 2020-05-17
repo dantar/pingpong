@@ -52,3 +52,8 @@ export class TableStartSseDto extends MessageDto {
     code = TableStartSseDto.CODE;
     table: TableDto;
 }
+export class TableDropSseDto extends MessageDto {
+    static CODE = 'table-drop';
+    code = TableDropSseDto.CODE;
+    table: TableDto;
+}

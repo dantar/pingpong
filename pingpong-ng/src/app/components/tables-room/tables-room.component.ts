@@ -1,10 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SharedDataService } from 'src/app/services/shared-data.service';
-import { PlayerDto, TableDto } from 'src/app/models/player.model';
+import { PlayerDto, TableDto, SeatDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
 import { MessageDto as SseDto, PingDto, RegisterPlayerDto, StalePlayersDto, AvailableTableDto,
-  TablePlayerAcceptSseDto, TablePlayerInvitationSseDto, TableStartSseDto } from 'src/app/models/operations-dto.model';
+  TablePlayerAcceptSseDto, TablePlayerInvitationSseDto, TableStartSseDto, TableDropSseDto } from 'src/app/models/operations-dto.model';
 import { Router } from '@angular/router';
 import { PlayerQuitDto } from 'src/app/models/fantascatti.model';
 
@@ -35,10 +35,6 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy(): void {
     this.destroySse();
-  }
-
-  dropTable(table: TableDto) {
-    console.log(table);
   }
 
   initSse() {
@@ -111,6 +107,9 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
       case TableStartSseDto.CODE:
         this.onSseTableStartSseDto(dto as TableStartSseDto);
         break;
+      case TableDropSseDto.CODE:
+        this.onSseTableDropSseDto(dto as TableDropSseDto);
+        break;
       case PlayerQuitDto.CODE:
         this.onPlayerQuit(dto as PlayerQuitDto);
         break;
@@ -120,6 +119,17 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
         console.log('cannot handle event', dto);
         break;
     }
+  }
+  onSseTableDropSseDto(dto: TableStartSseDto) {
+    if (this.tablesmap.hasOwnProperty(dto.table.uuid)) delete this.tablesmap[dto.table.uuid];
+    if (this.ownership.hasOwnProperty(dto.table.owner.uuid)) delete this.ownership[dto.table.owner.uuid];
+    dto.table.seats.forEach(s => {
+      if (s.player && this.seatedmap.hasOwnProperty(s.player.uuid)) delete this.seatedmap[s.player.uuid];
+    });
+    if (this.mytable && this.mytable.uuid === dto.table.uuid) {
+      this.mytable = null;
+    }
+    this.changes.detectChanges();
   }
   onSseTableStartSseDto(dto: TableStartSseDto) {
     this.router.navigate(['table', dto.table.uuid]);
@@ -239,6 +249,24 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
   _invitePlayer(player: PlayerDto) {
     this.rest.newTablePlayer(this.mytable, player).subscribe(table => {
       console.log(table);
+    });
+  }
+
+  clickSeat(seat: SeatDto) {
+    if (this.shared.player.uuid === this.mytable.owner.uuid) {
+      this.rest.acceptInvitation(this.mytable, seat.player, false).subscribe(t => {
+        console.log(t);
+      });
+    }
+  }
+
+  clickOwner() {
+
+  }
+
+  dropOwnTable() {
+    this.rest.dropTable(this.mytable).subscribe(r => {
+      console.log(r);
     });
   }
 

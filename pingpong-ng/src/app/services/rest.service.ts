@@ -28,6 +28,10 @@ export class RestService {
     return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + action, player);
   }
 
+  dropTable(table: TableDto) {
+    return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + '/drop', null);
+  }
+
   situation(): Observable<SituationDto> {
     return this.http.get<SituationDto>(environment.server + '/situation');
   }

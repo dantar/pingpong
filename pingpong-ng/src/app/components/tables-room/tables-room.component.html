@@ -15,16 +15,19 @@
         <app-player-avatar [player]="shared.player"></app-player-avatar>
     </div>
     <ng-container *ngIf="mytable">
-        <div *ngIf="mytable.owner.uuid !== shared.player.uuid" class="other-player table-owner">
+        <div *ngIf="mytable.owner.uuid !== shared.player.uuid" class="other-player table-owner" (click)="clickOwner()">
             <app-player-avatar [player]="mytable.owner"></app-player-avatar>
         </div>
         <ng-container *ngFor="let seat of mytable.seats">
-            <div *ngIf="seat.player.uuid !== shared.player.uuid" class="other-player seat-pending-{{seat.pending}}">
+            <div *ngIf="seat.player.uuid !== shared.player.uuid" class="other-player seat-pending-{{seat.pending}}" (click)="clickSeat(seat)">
                 <app-player-avatar [player]="seat.player"></app-player-avatar>
             </div>
         </ng-container>
         <div *ngIf="(mytable.owner.uuid === shared.player.uuid) && tableCanStart(mytable)" (click)="startTable(mytable)" class="svg-button">
             <app-svg-button text="Inizia!"></app-svg-button>
+        </div>
+        <div *ngIf="(mytable.owner.uuid === shared.player.uuid) && mytable.seats.length === 0" (click)="dropOwnTable()" class="svg-button">
+            <app-svg-button text="Lascia!"></app-svg-button>
         </div>
         <ng-container *ngIf="mytable.owner.uuid !== shared.player.uuid && isPending(mytable)" >
             <div (click)="acceptInvitation(mytable, true)" class="svg-button">

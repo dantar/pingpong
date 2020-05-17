@@ -25,6 +25,7 @@ import it.dantar.games.pingpong.dto.PlayerDto;
 import it.dantar.games.pingpong.dto.RegisterPlayerSseDto;
 import it.dantar.games.pingpong.dto.SeatDto;
 import it.dantar.games.pingpong.dto.SseDto;
+import it.dantar.games.pingpong.dto.TableDropDto;
 import it.dantar.games.pingpong.dto.TableDto;
 import it.dantar.games.pingpong.dto.TablePlayerAcceptSseDto;
 import it.dantar.games.pingpong.dto.TablePlayerInvitationSseDto;
@@ -156,6 +157,10 @@ public class TablesService {
 
 	public void removeTable(TableDto table) {
 		this.owners.remove(table.getOwner().getUuid());
+		if (seats.containsKey(table.getOwner().getUuid())) seats.remove(table.getOwner().getUuid());
+		table.getSeats().forEach(s -> {
+			if (s.getPlayer() != null && seats.containsKey(s.getPlayer().getUuid())) seats.remove(s.getPlayer().getUuid());
+		});
 		this.tables.remove(table.getUuid());
 	}
 
@@ -245,6 +250,14 @@ public class TablesService {
 		broadcastMessage(new TablePlayerInvitationSseDto()
 				.setTable(table)
 				.setPlayer(player));
+		return table;
+	}
+
+	public TableDto tableDrop(String gameId) {
+		TableDto table = this.tables.get(gameId).getDto();
+		removeTable(table);
+		broadcastMessage(new TableDropDto()
+				.setTable(table));
 		return table;
 	}
 
