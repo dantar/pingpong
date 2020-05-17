@@ -78,13 +78,15 @@ public class TablesService {
 				//players.remove(player.getDto().getUuid());
 			}
 		});
+		if (player.getEmitter() != null) {
+			player.getEmitter().complete();
+		}
 		player.setEmitter(emitter);
 		return emitter;
 	}
 
 	@Scheduled(fixedRate = 1000*30L)
 	public void refreshSse() {
-		Logger.getLogger(this.getClass().getName()).info("sending ping");
 		this.broadcastMessage(new SseDto().setCode("ping"));
 	}
 	
@@ -119,9 +121,11 @@ public class TablesService {
 				stale.add(player);
 			}
 		});
-		Logger.getLogger(this.getClass().getName()).info(String.format("Sse %s sent to %s players", message.getCode(), sent.size()));
+		if (!message.getCode().equals("ping")) {
+			Logger.getLogger(this.getClass().getName()).info(String.format("Sse %s sent to %s players", message.getCode(), sent.size()));
+		}
 		if (stale.size() > 0) {
-			Logger.getLogger(this.getClass().getName()).info(String.format("Stale emitters: %s", stale.size()));
+			Logger.getLogger(this.getClass().getName()).info(String.format("After %s stale emitters: %s", message.getCode(), stale.size()));
 			stale.forEach(player -> {
 				String playerUuid = player.getDto().getUuid();
 				Table table = this.owners.get(playerUuid);

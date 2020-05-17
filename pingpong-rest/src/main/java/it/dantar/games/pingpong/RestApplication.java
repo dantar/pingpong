@@ -9,10 +9,10 @@ import org.springframework.boot.SpringApplication;
 
 @SpringBootApplication
 @EnableScheduling
-public class RestAppplication {
+public class RestApplication {
 	
     public static void main(String[] args) {
-        SpringApplication.run(RestAppplication.class, args);
+        SpringApplication.run(RestApplication.class, args);
     }
 
 	@Bean
