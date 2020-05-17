@@ -39,9 +39,6 @@ export class SharedDataService {
       //this.sse = null;
       this.connected = false;
     })
-    this.sse.addEventListener('message', message => {
-      console.log(this, 'message', message);
-    })
   }
 
   setPlayer(player: PlayerDto) {

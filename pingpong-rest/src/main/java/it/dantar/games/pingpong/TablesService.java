@@ -85,7 +85,7 @@ public class TablesService {
 		return emitter;
 	}
 
-	@Scheduled(fixedRate = 1000*30L)
+	@Scheduled(fixedRate = 1000*5L)
 	public void refreshSse() {
 		this.broadcastMessage(new SseDto().setCode("ping"));
 	}

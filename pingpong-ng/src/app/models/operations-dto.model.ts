@@ -12,6 +12,10 @@ export class MessageDto {
     code: string;
 }
 
+export class PingDto extends MessageDto {
+    static CODE = 'ping';
+    code = PingDto.CODE;
+}
 export class RegisterPlayerDto extends MessageDto {
     static CODE = 'register-player';
     code = RegisterPlayerDto.CODE;

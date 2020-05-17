@@ -32,9 +32,6 @@
   <router-outlet *ngIf="shared.player && shared.sse && shared.connected"></router-outlet>
   
   <div class="panel-menu-list bottom-right-menu">
-    <div class="svg-button" *ngIf="shared.sse && shared.connected" (click)="sendHello()">
-      <app-svg-button text="Hello!"></app-svg-button>
-    </div>
     <div class="svg-button">
       <app-fullscreen-toggle></app-fullscreen-toggle>
     </div>

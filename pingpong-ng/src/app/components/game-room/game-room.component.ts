@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TableDto, PlayerDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
 import { environment } from 'src/environments/environment';
-import { MessageDto } from 'src/app/models/operations-dto.model';
+import { MessageDto, PingDto } from 'src/app/models/operations-dto.model';
 import { FantascattiSseDto, NewPlayerDto, PlayerReadyDto, NewGuessDto, FantascattiCardDto, 
   FantascattiPiece, PlayerPicksPieceDto, PlayerQuitDto } from 'src/app/models/fantascatti.model';
 import { SharedDataService } from 'src/app/services/shared-data.service';
@@ -111,7 +111,9 @@ export class GameRoomComponent implements OnInit, OnDestroy {
   );
 
   onSseEvent(dto: FantascattiSseDto) {
-    console.log('event ' + dto.code, dto);
+    if (dto.code !== PingDto.CODE) {
+      console.log('event ' + dto.code, dto);
+    }
     switch (dto.code) {
       case NewPlayerDto.CODE:
         this.onSseNewPlayerDto(dto as NewPlayerDto);
@@ -127,6 +129,8 @@ export class GameRoomComponent implements OnInit, OnDestroy {
         break;
       case PlayerQuitDto.CODE:
         this.onPlayerQuit(dto as PlayerQuitDto);
+        break;
+      case PingDto.CODE:
         break;
       default:
         console.log('cannot handle event', dto);

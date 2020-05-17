@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { SharedDataService } from 'src/app/services/shared-data.service';
 import { PlayerDto, TableDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
-import { MessageDto as SseDto, RegisterPlayerDto, StalePlayersDto, AvailableTableDto,
+import { MessageDto as SseDto, PingDto, RegisterPlayerDto, StalePlayersDto, AvailableTableDto,
   TablePlayerAcceptSseDto, TablePlayerInvitationSseDto, TableStartSseDto } from 'src/app/models/operations-dto.model';
 import { Router } from '@angular/router';
 import { PlayerQuitDto } from 'src/app/models/fantascatti.model';
@@ -89,7 +89,9 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
   }
 
   onSseEvent(dto: SseDto) {
-    console.log('event ' + dto.code, dto);
+    if (dto.code !== PingDto.CODE) {
+      console.log('event ' + dto.code, dto);
+    }
     switch (dto.code) {
       case RegisterPlayerDto.CODE:
         this.onSseRegisterPlayer(dto as RegisterPlayerDto);
@@ -111,6 +113,8 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
         break;
       case PlayerQuitDto.CODE:
         this.onPlayerQuit(dto as PlayerQuitDto);
+        break;
+      case PingDto.CODE:
         break;
       default:
         console.log('cannot handle event', dto);
