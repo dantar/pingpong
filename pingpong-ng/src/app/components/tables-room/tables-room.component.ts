@@ -226,6 +226,7 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
 
   clickPlayer(player: PlayerDto) {
     if (this.mytable) {
+      if (this.mytable.seats.filter(s => s.player && s.player.uuid === player.uuid).length > 0) return;
       this._invitePlayer(player);
     } else {
       this.rest.newTable({seats: [], owner: this.shared.player}).subscribe(table => {

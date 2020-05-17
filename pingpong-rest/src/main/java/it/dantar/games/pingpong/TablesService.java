@@ -233,6 +233,9 @@ public class TablesService {
 	}
 
 	public TableDto tablePlayerInvitation(String gameId, PlayerDto player) {
+		if (seats.get(player.getUuid()) != null ) {
+			return getTable(gameId);
+		}
 		seats.put(player.getUuid(), this.tables.get(gameId));
 		TableDto table = getTable(gameId).addSeat(new SeatDto()
 				.setOpen(false)
