@@ -29,12 +29,12 @@ import {
       transition(':enter', [
         style({'transform-origin': 'center', transform: 'rotateY(90deg)'}), 
         animate('400ms', style({'transform-origin': 'center', transform: 'rotateY(90deg)'})),
-        animate('500ms', style({'transform-origin': 'center', transform:'none'})),
+        animate('400ms', style({'transform-origin': 'center', transform:'none'})),
       ]),
       transition(':leave', [
         style({'transform-origin': 'center', transform:'none'}), 
-        animate('500ms', style({'transform-origin': 'center', transform: 'rotateY(-90deg)'})),
-        animate('500ms', style({'transform-origin': 'center', transform: 'rotateY(-90deg)'})),
+        animate('400ms', style({'transform-origin': 'center', transform: 'rotateY(-90deg)'})),
+        animate('400ms', style({'transform-origin': 'center', transform: 'rotateY(-90deg)'})),
       ]),
     ]),
   ]
