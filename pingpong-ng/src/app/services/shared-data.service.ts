@@ -25,13 +25,11 @@ export class SharedDataService {
   }
 
   initSse() {
-    this.sse = new EventSource(environment.server + '/sse/request/' + this.player.uuid);
+    this.sse = new EventSource(environment.server + '/sse/request/' + this.player.uuid + '/' + new Date().getTime());
     this.sse.addEventListener('open', open => {
-      if (!this.connected) {
-        this.rest.ackSse(this.player).subscribe(player => {
-          console.log('ack', player);
-        });
-      }
+      this.rest.ackSse(this.player).subscribe(player => {
+        console.log('ack', player);
+      });
       this.connected = true;
       console.log(this, 'open', open);
     })

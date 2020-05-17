@@ -2,11 +2,13 @@ package it.dantar.games.pingpong;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.boot.SpringApplication;
 
 @SpringBootApplication
+@EnableScheduling
 public class RestAppplication {
 	
     public static void main(String[] args) {

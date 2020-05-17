@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -24,7 +25,6 @@ import it.dantar.games.pingpong.dto.PlayerDto;
 import it.dantar.games.pingpong.dto.RegisterPlayerSseDto;
 import it.dantar.games.pingpong.dto.SeatDto;
 import it.dantar.games.pingpong.dto.SseDto;
-import it.dantar.games.pingpong.dto.SseStatusDto;
 import it.dantar.games.pingpong.dto.TableDto;
 import it.dantar.games.pingpong.dto.TablePlayerAcceptSseDto;
 import it.dantar.games.pingpong.dto.TablePlayerInvitationSseDto;
@@ -44,7 +44,7 @@ public class TablesService {
 	Map<String, Table> owners = new HashMap<String, Table>();
 	Map<String, Table> seats = new HashMap<String, Table>();
 	
-	static final long TIMEOUT = 1000*60*60*4L;
+	static final long TIMEOUT = 1000*60*60*2L;
 	
 	@Autowired
 	FantascattiService fantascattiService;
@@ -55,10 +55,6 @@ public class TablesService {
 			player = new Player().setDto(dto
 					.setUuid(UUID.randomUUID().toString()));
 		} else {
-			player = this.players.get(dto.getUuid());
-			if (player != null && player.getEmitter() != null) {
-				player.getEmitter().complete();
-			}
 			player = new Player().setDto(dto);
 		}
 		this.players.put(player.getDto().getUuid(), player);			
@@ -67,24 +63,31 @@ public class TablesService {
 	public SseEmitter requestPlayerSse(String uuid) {
 		Player player = players.get(uuid);
 		if (player == null) {
-			return null;
+			throw new RuntimeException("Player does not exist");
 		}
 		return requestPlayerSse(player);
 	}
 
 	private SseEmitter requestPlayerSse(Player player) {
-		if (player.getEmitter() != null) {
-			player.getEmitter().complete();
-		}
-		return player
-				.setEmitter(new SseEmitter(TIMEOUT))
-				.getEmitter();
+		SseEmitter emitter = new SseEmitter(TIMEOUT);
+		Logger logger = Logger.getLogger(this.getClass().getName());
+		emitter.onCompletion(new Runnable() {
+			@Override
+			public void run() {
+				logger.info(String.format("onCompletion server event for %s", player.getDto().getUuid()));
+				//players.remove(player.getDto().getUuid());
+			}
+		});
+		player.setEmitter(emitter);
+		return emitter;
 	}
 
-	public SseStatusDto statusPlayerSse(String uuid) {
-		return new SseStatusDto();
+	@Scheduled(fixedRate = 1000*30L)
+	public void refreshSse() {
+		Logger.getLogger(this.getClass().getName()).info("sending ping");
+		this.broadcastMessage(new SseDto().setCode("ping"));
 	}
-
+	
 	public void ackPlayerSse(PlayerDto player) {
 		Table table = this.owners.get(player.getUuid());
 		if (table == null)
@@ -158,6 +161,7 @@ public class TablesService {
 
 	public List<PlayerDto> listPlayers() {
 		return this.players.entrySet().stream()
+				.filter(p -> p.getValue().getEmitter() != null)
 				.map(entry -> entry.getValue().getDto())
 				.collect(Collectors.toList());
 	}

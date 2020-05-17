@@ -13,7 +13,6 @@ import it.dantar.games.pingpong.dto.AvailableTableSseDto;
 import it.dantar.games.pingpong.dto.PlayerDto;
 import it.dantar.games.pingpong.dto.SituationDto;
 import it.dantar.games.pingpong.dto.SseDto;
-import it.dantar.games.pingpong.dto.SseStatusDto;
 import it.dantar.games.pingpong.dto.TableDto;
 import it.dantar.games.pingpong.dto.TableStartSseDto;
 
@@ -30,16 +29,10 @@ public class TablesController {
 		return player;
 	}
 
-	@GetMapping("/sse/request/{uuid}")
-	public SseEmitter playerSseRequest(@PathVariable String uuid) {
+	@GetMapping("/sse/request/{uuid}/{nocache}")
+	public SseEmitter playerSseRequest(@PathVariable String uuid, @PathVariable String nocache) {
 		Logger.getLogger(this.getClass().getName()).info(String.format("New SSE for player %s", uuid));
 		return pingpongService.requestPlayerSse(uuid);
-	}
-
-	@GetMapping("/sse/status/{uuid}")
-	public SseStatusDto playerSseStatus(@PathVariable String uuid) {
-		Logger.getLogger(this.getClass().getName()).info(String.format("SSE status for player %s", uuid));
-		return pingpongService.statusPlayerSse(uuid);
 	}
 
 	@PostMapping("/sse/ack")
