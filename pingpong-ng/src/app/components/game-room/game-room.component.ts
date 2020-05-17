@@ -9,10 +9,27 @@ import { FantascattiSseDto, NewPlayerDto, PlayerReadyDto, NewGuessDto, Fantascat
 import { SharedDataService } from 'src/app/services/shared-data.service';
 import { FantascattiService } from 'src/app/services/fantascatti.service';
 
+import {
+  trigger,
+  state,
+  style,
+  animate,
+  transition,
+  query,
+  stagger,
+  // ...
+} from '@angular/animations';
+
 @Component({
   selector: 'app-game-room',
   templateUrl: './game-room.component.html',
-  styleUrls: ['./game-room.component.scss']
+  styleUrls: ['./game-room.component.scss'],
+  animations: [
+    trigger('flip', [
+      transition(':enter', [style({opacity: 0, transform: 'translateY(-300px)'}), animate('1s', style({opacity: 1, transform:'none'}))]),
+      transition(':leave', [style({opacity: 1, transform:'none'}), animate('1s', style({opacity: 0, transform: 'translateY(300px)'}))]),
+    ]),
+  ]
 })
 export class GameRoomComponent implements OnInit, OnDestroy {
 
@@ -185,6 +202,7 @@ export class GameRoomComponent implements OnInit, OnDestroy {
 
   resetTurn() {
     this.state = 'wait-for-ready';
+    this.guessKey = '';
     this.ready = [];
     this.mypick = null;
   }
