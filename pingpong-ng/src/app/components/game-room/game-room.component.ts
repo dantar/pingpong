@@ -26,8 +26,16 @@ import {
   styleUrls: ['./game-room.component.scss'],
   animations: [
     trigger('flip', [
-      transition(':enter', [style({opacity: 0, transform: 'translateY(-300px)'}), animate('1s', style({opacity: 1, transform:'none'}))]),
-      transition(':leave', [style({opacity: 1, transform:'none'}), animate('1s', style({opacity: 0, transform: 'translateY(300px)'}))]),
+      transition(':enter', [
+        style({'transform-origin': 'center', transform: 'rotateY(90deg)'}), 
+        animate('400ms', style({'transform-origin': 'center', transform: 'rotateY(90deg)'})),
+        animate('500ms', style({'transform-origin': 'center', transform:'none'})),
+      ]),
+      transition(':leave', [
+        style({'transform-origin': 'center', transform:'none'}), 
+        animate('500ms', style({'transform-origin': 'center', transform: 'rotateY(-90deg)'})),
+        animate('500ms', style({'transform-origin': 'center', transform: 'rotateY(-90deg)'})),
+      ]),
     ]),
   ]
 })
