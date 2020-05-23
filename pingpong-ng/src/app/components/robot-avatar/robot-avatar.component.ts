@@ -11,10 +11,10 @@ export class RobotAvatarComponent implements OnInit {
   constructor() { }
 
   @Input() robot: RobotDto;
-  glyph: string;
+  @Input() glyph: string;
 
   ngOnInit(): void {
-    this.glyph = this.robot.name.length > 0 ? this.robot.name[0] : '';
+    if (!this.glyph) this.glyph = this.robot.name.length > 0 ? this.robot.name[0] : '';
   }
 
 }

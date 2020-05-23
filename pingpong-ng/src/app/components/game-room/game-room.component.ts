@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TableDto, PlayerDto } from 'src/app/models/player.model';
+import { TableDto, PlayerDto, SeatDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
 import { environment } from 'src/environments/environment';
 import { MessageDto, PingDto } from 'src/app/models/operations-dto.model';
@@ -108,7 +108,7 @@ export class GameRoomComponent implements OnInit, OnDestroy {
     this.rest.table(this.activatedRoute.snapshot.params['uuid']).subscribe(table => {
       this.table = table;
       this.players.push(table.owner);
-      this.players.push(...table.seats.map(s=>s.player)); // array spread operator!
+      this.players.push(...table.seats.filter(s=>s.player ? true: false).map(s=>s.player)); // array spread operator!
       this.players.forEach(p => {
         this.score[p.uuid] = 0;
       })
@@ -238,8 +238,12 @@ export class GameRoomComponent implements OnInit, OnDestroy {
     this.quitting = true;
   }
 
-  clickPlayer(player: PlayerDto) {
-    if (player.uuid === this.shared.player.uuid) this.iQuit();
+  clickOwner() {
+    if (this.table.owner.uuid === this.shared.player.uuid) this.iQuit();
+  }
+
+  clickSeat(seat: SeatDto) {
+    if (seat.player && seat.player.uuid === this.shared.player.uuid) this.iQuit();
   }
 
   pick(piece: FantascattiPiece) {

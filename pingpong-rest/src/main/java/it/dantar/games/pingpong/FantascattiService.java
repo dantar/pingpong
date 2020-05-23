@@ -52,7 +52,10 @@ public class FantascattiService {
 		FantascattiGame game = this.games.get(gameId);
 		game.getReady().add(player.getUuid());
 		this.tablesService.broadcastMessageToTable(gameId, new FantascattiPlayerReadySseDto().setPlayer(player));			
-		if (game.getReady().size() >= tablesService.getTable(gameId).getSeats().size()+1) {
+		if (game.getReady().size() >= tablesService.getTable(gameId).getSeats()
+				.stream()
+				.filter(s -> s.getPlayer() != null)
+				.count()+1) {
 			this.nextTurn(gameId);
 		}
 	}
