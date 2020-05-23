@@ -20,7 +20,14 @@ export class TableDto {
 }
 
 export class SeatDto {
-    player: PlayerDto;
+    robot?: RobotDto;
+    player?: PlayerDto;
     pending: boolean;
     open: boolean;
+}
+
+export class RobotDto {
+    name: string;
+    level: number;
+    avatar: AvatarDto;
 }

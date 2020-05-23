@@ -1,4 +1,4 @@
-import { PlayerDto, TableDto } from './player.model';
+import { PlayerDto, TableDto, RobotDto } from './player.model';
 
 export class OpResult {
 
@@ -40,6 +40,12 @@ export class TablePlayerInvitationSseDto extends MessageDto {
     table: TableDto;
     player: PlayerDto;
 }
+export class TableRobotInvitationSseDto extends MessageDto {
+    static CODE = 'table-robot';
+    code = TableRobotInvitationSseDto.CODE;
+    table: TableDto;
+    robot: RobotDto;
+}
 export class TablePlayerAcceptSseDto extends MessageDto {
     static CODE = 'table-accept';
     code = TablePlayerAcceptSseDto.CODE;
@@ -55,5 +61,10 @@ export class TableStartSseDto extends MessageDto {
 export class TableDropSseDto extends MessageDto {
     static CODE = 'table-drop';
     code = TableDropSseDto.CODE;
+    table: TableDto;
+}
+export class TableUpdateSseDto extends MessageDto {
+    static CODE = 'table-update';
+    code = TableUpdateSseDto.CODE;
     table: TableDto;
 }

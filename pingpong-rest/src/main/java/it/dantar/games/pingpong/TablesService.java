@@ -23,12 +23,15 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import it.dantar.games.pingpong.dto.DroppedStalePlayerSseDto;
 import it.dantar.games.pingpong.dto.PlayerDto;
 import it.dantar.games.pingpong.dto.RegisterPlayerSseDto;
+import it.dantar.games.pingpong.dto.RobotDto;
 import it.dantar.games.pingpong.dto.SeatDto;
 import it.dantar.games.pingpong.dto.SseDto;
 import it.dantar.games.pingpong.dto.TableDropDto;
 import it.dantar.games.pingpong.dto.TableDto;
 import it.dantar.games.pingpong.dto.TablePlayerAcceptSseDto;
 import it.dantar.games.pingpong.dto.TablePlayerInvitationSseDto;
+import it.dantar.games.pingpong.dto.TableRobotInvitationSseDto;
+import it.dantar.games.pingpong.dto.TableUpdateSseDto;
 import it.dantar.games.pingpong.models.Player;
 import it.dantar.games.pingpong.models.Table;
 
@@ -258,6 +261,41 @@ public class TablesService {
 		removeTable(table);
 		broadcastMessage(new TableDropDto()
 				.setTable(table));
+		return table;
+	}
+
+	public TableDto tableRobotInvitation(String gameId, RobotDto robot) {
+		TableDto table = getTable(gameId).addSeat(new SeatDto()
+				.setOpen(false)
+				.setPending(false)
+				.setRobot(robot)
+				);
+		broadcastMessage(new TableRobotInvitationSseDto()
+				.setTable(table)
+				.setRobot(robot));
+		return table;
+	}
+
+	public TableDto tableDropSeat(String gameId, SeatDto seat) {
+		if (seat.getPlayer() != null) {
+			return this.tablePlayerReject(gameId, seat.getPlayer());
+		}
+		if (seat.getRobot() != null) {
+			return this.tableDropRobot(gameId, seat.getRobot());
+		}
+		return this.getTable(gameId);
+	}
+
+	private TableDto tableDropRobot(String gameId, RobotDto robot) {
+		TableDto table = getTable(gameId);
+		table.setSeats(table.getSeats()
+				.stream()
+				.filter(s -> s.getRobot() == null || !s.getRobot().getName().equals(robot.getName()))
+				.collect(Collectors.toList())
+				);
+		broadcastMessage(new TableUpdateSseDto()
+				.setTable(table)
+				);
 		return table;
 	}
 

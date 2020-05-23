@@ -11,6 +11,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import it.dantar.games.pingpong.dto.AvailableTableSseDto;
 import it.dantar.games.pingpong.dto.PlayerDto;
+import it.dantar.games.pingpong.dto.RobotDto;
+import it.dantar.games.pingpong.dto.SeatDto;
 import it.dantar.games.pingpong.dto.SituationDto;
 import it.dantar.games.pingpong.dto.SseDto;
 import it.dantar.games.pingpong.dto.TableDto;
@@ -69,6 +71,11 @@ public class TablesController {
 		return this.pingpongService.tablePlayerInvitation(gameId, player);
 	}
 
+	@PostMapping("/table/{gameId}/robot")
+	public TableDto postTablePlayerInvitation(@PathVariable String gameId, @RequestBody RobotDto robot) {
+		return this.pingpongService.tableRobotInvitation(gameId, robot);
+	}
+
 	@PostMapping("/table/{gameId}/accept")
 	public TableDto postTablePlayerAccept(@PathVariable String gameId, @RequestBody PlayerDto player) {
 		return pingpongService.tablePlayerAccept(gameId, player);
@@ -77,6 +84,11 @@ public class TablesController {
 	@PostMapping("/table/{gameId}/reject")
 	public TableDto postTablePlayerReject(@PathVariable String gameId, @RequestBody PlayerDto player) {
 		return this.pingpongService.tablePlayerReject(gameId, player);
+	}
+
+	@PostMapping("/table/{gameId}/seat/drop")
+	public TableDto postTablePlayerReject(@PathVariable String gameId, @RequestBody SeatDto seat) {
+		return this.pingpongService.tableDropSeat(gameId, seat);
 	}
 
 	@GetMapping("/situation")

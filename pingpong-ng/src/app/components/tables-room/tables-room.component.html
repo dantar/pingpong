@@ -6,6 +6,11 @@
                 <app-player-avatar [player]="player"></app-player-avatar>
             </div>
         </div>
+        <div *ngFor="let robot of robots">
+            <div (click)="clickRobot(robot)" class="available-robot">
+                <app-robot-avatar [robot]="robot"></app-robot-avatar>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -19,8 +24,11 @@
             <app-player-avatar [player]="mytable.owner"></app-player-avatar>
         </div>
         <ng-container *ngFor="let seat of mytable.seats">
-            <div *ngIf="seat.player.uuid !== shared.player.uuid" class="other-player seat-pending-{{seat.pending}}" (click)="clickSeat(seat)">
+            <div *ngIf="seat.player && seat.player.uuid !== shared.player.uuid" class="other-player seat-pending-{{seat.pending}}" (click)="clickSeat(seat)">
                 <app-player-avatar [player]="seat.player"></app-player-avatar>
+            </div>
+            <div *ngIf="seat.robot" class="other-player seat-pending-{{seat.pending}}" (click)="clickSeat(seat)">
+                <app-robot-avatar [robot]="seat.robot"></app-robot-avatar>
             </div>
         </ng-container>
         <div *ngIf="(mytable.owner.uuid === shared.player.uuid) && tableCanStart(mytable)" (click)="startTable(mytable)" class="svg-button">

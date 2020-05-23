@@ -1,10 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SharedDataService } from 'src/app/services/shared-data.service';
-import { PlayerDto, TableDto, SeatDto } from 'src/app/models/player.model';
+import { PlayerDto, TableDto, SeatDto, RobotDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
 import { MessageDto as SseDto, PingDto, RegisterPlayerDto, StalePlayersDto, AvailableTableDto,
-  TablePlayerAcceptSseDto, TablePlayerInvitationSseDto, TableStartSseDto, TableDropSseDto } from 'src/app/models/operations-dto.model';
+  TablePlayerAcceptSseDto, TablePlayerInvitationSseDto, TableStartSseDto, TableDropSseDto, TableRobotInvitationSseDto, TableUpdateSseDto } from 'src/app/models/operations-dto.model';
 import { Router } from '@angular/router';
 import { PlayerQuitDto } from 'src/app/models/fantascatti.model';
 
@@ -22,6 +22,7 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     private router: Router) { }
 
   players: PlayerDto[];
+  robots: RobotDto[];
   tablesmap: {[id:string]: TableDto};
   ownership: {[id:string]: TableDto};
   seatedmap: {[id:string]: TableDto};
@@ -30,6 +31,9 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.players = null;
+    this.robots = [
+      {name: 'Woren', avatar: {color: '#2200ff'}, level: 0}
+    ];
     this.initSse();
     this.initSituation();
   }
@@ -101,6 +105,9 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
       case TablePlayerInvitationSseDto.CODE:
         this.onSseTablePlayerInvitation(dto as TablePlayerInvitationSseDto);
         break;
+      case TableRobotInvitationSseDto.CODE:
+        this.onSseTableRobotInvitation(dto as TableRobotInvitationSseDto);
+        break;
       case TablePlayerAcceptSseDto.CODE:
         this.onSseTablePlayerAccept(dto as TablePlayerAcceptSseDto);
         break;
@@ -109,6 +116,9 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
         break;
       case TableDropSseDto.CODE:
         this.onSseTableDropSseDto(dto as TableDropSseDto);
+        break;
+      case TableUpdateSseDto.CODE:
+        this.onSseTableUpdate(dto as TableUpdateSseDto);
         break;
       case PlayerQuitDto.CODE:
         this.onPlayerQuit(dto as PlayerQuitDto);
@@ -140,6 +150,24 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     this.ownership[dto.table.owner.uuid] = dto.table;
     this.seatedmap[dto.player.uuid] = dto.table;
     if (dto.player.uuid === this.shared.player.uuid || dto.table.owner.uuid === this.shared.player.uuid ||
+      (this.mytable && this.mytable.uuid === dto.table.uuid)) {
+      this.mytable = dto.table;
+    }
+    this.changes.detectChanges();
+  }
+  onSseTableRobotInvitation(dto: TableRobotInvitationSseDto) {
+    this.tablesmap[dto.table.uuid] = dto.table;
+    this.ownership[dto.table.owner.uuid] = dto.table;
+    if (dto.table.owner.uuid === this.shared.player.uuid ||
+      (this.mytable && this.mytable.uuid === dto.table.uuid)) {
+      this.mytable = dto.table;
+    }
+    this.changes.detectChanges();
+  }
+  onSseTableUpdate(dto: TableUpdateSseDto) {
+    this.tablesmap[dto.table.uuid] = dto.table;
+    this.ownership[dto.table.owner.uuid] = dto.table;
+    if (dto.table.owner.uuid === this.shared.player.uuid ||
       (this.mytable && this.mytable.uuid === dto.table.uuid)) {
       this.mytable = dto.table;
     }
@@ -252,9 +280,27 @@ export class TablesRoomComponent implements OnInit, OnDestroy {
     });
   }
 
+  clickRobot(robot: RobotDto) {
+    if (this.mytable) {
+      if (this.mytable.seats.filter(s => s.robot && s.robot.name === robot.name).length > 0 || 
+        this.mytable.owner.uuid !== this.shared.player.uuid) return;
+      this._inviteRobot(robot);
+    } else {
+      this.rest.newTable({seats: [], owner: this.shared.player}).subscribe(table => {
+        this.mytable = table;
+        this._inviteRobot(robot);
+      });
+    }
+  }
+  _inviteRobot(robot: RobotDto) {
+    this.rest.newTableRobot(this.mytable, robot).subscribe(table => {
+      console.log(table);
+    });
+  }
+
   clickSeat(seat: SeatDto) {
     if (this.shared.player.uuid === this.mytable.owner.uuid) {
-      this.rest.acceptInvitation(this.mytable, seat.player, false).subscribe(t => {
+      this.rest.dropSeat(this.mytable, seat).subscribe(t => {
         console.log(t);
       });
     }

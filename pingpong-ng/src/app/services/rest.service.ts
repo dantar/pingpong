@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PlayerDto, TableDto, SituationDto } from '../models/player.model';
+import { PlayerDto, TableDto, SituationDto, RobotDto, SeatDto } from '../models/player.model';
 import { Observable } from 'rxjs';
 import { OpResult } from '../models/operations-dto.model';
 import { environment } from 'src/environments/environment';
@@ -9,6 +9,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class RestService {
+
   constructor(private http: HttpClient) { }
 
   register(player: PlayerDto): Observable<PlayerDto> {
@@ -23,9 +24,17 @@ export class RestService {
     return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + '/invite', player);
   }
 
+  newTableRobot(table: TableDto, robot: RobotDto) {
+    return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + '/robot', robot);
+  }
+
   acceptInvitation(table: TableDto, player: PlayerDto, accept: boolean) {
     const action = accept ? '/accept' : '/reject';
     return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + action, player);
+  }
+
+  dropSeat(table: TableDto, seat: SeatDto) {
+    return this.http.post<TableDto>(environment.server + '/table/' + table.uuid + '/seat/drop', seat);
   }
 
   dropTable(table: TableDto) {

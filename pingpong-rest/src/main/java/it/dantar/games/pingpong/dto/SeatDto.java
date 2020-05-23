@@ -3,6 +3,7 @@ package it.dantar.games.pingpong.dto;
 public class SeatDto {
 
 	PlayerDto player;
+	RobotDto robot;
 	Boolean pending;
 	Boolean open;
 	
@@ -25,6 +26,13 @@ public class SeatDto {
 	}
 	public SeatDto setOpen(Boolean open) {
 		this.open = open;
+		return this;
+	}
+	public RobotDto getRobot() {
+		return robot;
+	}
+	public SeatDto setRobot(RobotDto robot) {
+		this.robot = robot;
 		return this;
 	}
 

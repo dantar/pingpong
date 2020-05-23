@@ -14,6 +14,7 @@ import { SvgButtonComponent } from './components/svg-button/svg-button.component
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { FullscreenToggleComponent } from './components/fullscreen-toggle/fullscreen-toggle.component';
 import { SseConnectionComponent } from './components/sse-connection/sse-connection.component';
+import { RobotAvatarComponent } from './components/robot-avatar/robot-avatar.component';
 
 
 @NgModule({
@@ -25,7 +26,8 @@ import { SseConnectionComponent } from './components/sse-connection/sse-connecti
     PlayerAvatarComponent,
     SvgButtonComponent,
     FullscreenToggleComponent,
-    SseConnectionComponent
+    SseConnectionComponent,
+    RobotAvatarComponent
   ],
   imports: [
     BrowserModule,
