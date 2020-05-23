@@ -52,6 +52,7 @@ export class GameRoomComponent implements OnInit, OnDestroy {
 
   table: TableDto;
   guess: FantascattiCardDto;
+  lastguess: FantascattiCardDto;
 
   guessKey: string;
 
@@ -59,6 +60,7 @@ export class GameRoomComponent implements OnInit, OnDestroy {
   ready: string[];
   score: {[id: string]: number};
   mypick: FantascattiPiece;
+  lastpick: FantascattiPiece;
   moves: PlayerPicksPieceDto[];
 
   paletteA: {[color:string]: string};
@@ -180,6 +182,8 @@ export class GameRoomComponent implements OnInit, OnDestroy {
     this.initGuessKey();
     this.state = 'wait-for-picks';
     this.changes.detectChanges();
+    this.lastpick = null;
+    this.lastguess = null;
   }
   initGuessKey() {
     if (this.guess.shape1.localeCompare(this.guess.shape2) < 0 ) {
@@ -241,6 +245,8 @@ export class GameRoomComponent implements OnInit, OnDestroy {
   pick(piece: FantascattiPiece) {
     if (this.mypick === null && this.state === 'wait-for-picks') {
       this.mypick = piece;
+      this.lastpick = this.mypick;
+      this.lastguess = this.guess;
       this.fantascatti.pickPiece(this.table, this.shared.player, piece).subscribe(r => {
         // loading?
       });
@@ -250,6 +256,8 @@ export class GameRoomComponent implements OnInit, OnDestroy {
   pickByShape(shape: string) {
     if (this.mypick === null && this.state === 'wait-for-picks') {
       this.mypick = this.piecesmap[shape];
+      this.lastpick = this.mypick;
+      this.lastguess = this.guess;
       this.fantascatti.pickPiece(this.table, this.shared.player, this.piecesmap[shape]).subscribe(r => {
         // loading?
       });

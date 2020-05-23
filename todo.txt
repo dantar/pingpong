@@ -1,6 +1,9 @@
-- mostrare quale pezzo hai scelto!
-- mostrare quale pezzo era!
+TODO
 - se sbagli, c'è un tempo di timeout e poi puoi provare ad indovinare di nuovo
 - cambia il tuo avatar
 - i pezzi ruotano
 - cambiare sfondo del disegno e del toggle
+
+DONE:
+- mostrare quale pezzo hai scelto!
+- mostrare quale pezzo era!

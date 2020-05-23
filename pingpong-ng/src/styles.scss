@@ -48,3 +48,20 @@
         opacity: 0.5;
     }
 }
+
+.pick-piece {
+    opacity: 0.4;
+}
+.pick-piece.pick-none {
+    opacity: 1;
+}
+#dragon.pick-piece.pick-dragon, #chest.pick-piece.pick-chest, #gold.pick-piece.pick-gold, #sword.pick-piece.pick-sword, #shield.pick-piece.pick-shield {
+    opacity: 1;
+}
+
+.aura {
+    opacity: 0;
+}
+#aura-dragon.guess-dragon, #aura-chest.guess-chest, #aura-gold.guess-gold, #aura-sword.guess-sword, #aura-shield.guess-shield,  {
+    opacity: 1;
+}
