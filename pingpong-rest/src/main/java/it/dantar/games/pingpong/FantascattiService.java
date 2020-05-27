@@ -51,6 +51,12 @@ public class FantascattiService {
 	
 	public void playerReady(String gameId, PlayerDto player) {
 		FantascattiGame game = this.games.get(gameId);
+		game.setNoWait(
+				this.tablesService.getTable(gameId).getSeats()
+				.stream()
+				.filter(s -> s.getRobot() != null && s.getRobot().getName().equals("Woren"))
+				.count() > 0
+		);
 		game.getReady().add(player.getUuid());
 		this.tablesService.broadcastMessageToTable(gameId, new FantascattiPlayerReadySseDto().setPlayer(player));			
 		if (game.getReady().size() >= tablesService.getTable(gameId).getSeats()

@@ -359,6 +359,27 @@
          >{{ready.length}}/{{players.length}}</tspan></text>
 </g>
 
+<g id="dial" *ngIf="timeDial">
+   <rect
+      style="opacity:0.5;vector-effect:none;fill:#000000;fill-opacity:1;stroke:none;stroke-width:9.66634274;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+      id="rect975"
+      width="29.674734"
+      height="17.126562"
+      x="69.686066"
+      y="8.3140917"
+      ry="3.9001083" />
+   <text
+      id="text1051-36"
+      y="21.545469"
+      x="84.537376"
+      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.7080946px;line-height:1.25;font-family:'AR JULIAN';-inkscape-font-specification:'AR JULIAN, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.36770919"
+      xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.7080946px;font-family:'AR JULIAN';-inkscape-font-specification:'AR JULIAN, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;stroke-width:0.36770919"
+         y="21.545469"
+         x="84.537376"
+         id="tspan1049-7">{{timeDial.score}}</tspan></text>
+</g>
+
 </svg>
 
 <div class="panel-menu-list top-left-menu leader-board" *ngIf="table">

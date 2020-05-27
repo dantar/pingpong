@@ -2,7 +2,6 @@ import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TableDto, PlayerDto, SeatDto } from 'src/app/models/player.model';
 import { RestService } from 'src/app/services/rest.service';
-import { environment } from 'src/environments/environment';
 import { MessageDto, PingDto } from 'src/app/models/operations-dto.model';
 import { FantascattiSseDto, NewPlayerDto, PlayerReadyDto, NewGuessDto, FantascattiCardDto, 
   FantascattiPiece, PlayerPicksPieceDto, PlayerQuitDto } from 'src/app/models/fantascatti.model';
@@ -19,6 +18,8 @@ import {
   stagger,
   // ...
 } from '@angular/animations';
+import { TimeDial } from 'src/app/models/widget.model';
+import { ParseErrorLevel } from '@angular/compiler';
 
 @Component({
   selector: 'app-game-room',
@@ -85,6 +86,8 @@ export class GameRoomComponent implements OnInit, OnDestroy {
 
   quitting: boolean;
 
+  timeDial: TimeDial;
+
   ngOnInit(): void {
     this.cleared = true;
     this.quitting = false;
@@ -125,6 +128,13 @@ export class GameRoomComponent implements OnInit, OnDestroy {
       this.players.forEach(p => {
         this.score[p.uuid] = 0;
       })
+      if (this.table.seats.filter(s => s.robot && s.robot.name==='Woren').length > 0) {
+        this.timeDial = new TimeDial(100, (dial)=> {
+          console.log("timesup!");
+        });
+      } else {
+        this.timeDial = null;
+      }
     });
   }
   ngOnDestroy(): void {
@@ -185,6 +195,10 @@ export class GameRoomComponent implements OnInit, OnDestroy {
     if (dto.score) {
       this.lastguess = this.guess;
       this.score = dto.score;
+      if (this.timeDial) {
+        this.timeDial.levelup(dto.piece.shape === this.guess.correct);
+        this.score['Woren'] = this.timeDial.level;
+      }
       this.resetTurn();
     } else if (this.moves.length >= this.players.length) {
       this.resetTurn();
@@ -213,6 +227,7 @@ export class GameRoomComponent implements OnInit, OnDestroy {
     this.ready.push(dto.player.uuid);
     if (this.ready.length >= this.players.length) {
       this.state = 'wait-for-guess';
+      if (this.timeDial) this.timeDial.start();
     }
     this.changes.detectChanges();
   }
@@ -263,19 +278,8 @@ export class GameRoomComponent implements OnInit, OnDestroy {
     if (seat.player && seat.player.uuid === this.shared.player.uuid) this.iQuit();
   }
 
-  pick(piece: FantascattiPiece) {
-    if (this.mypick === null && this.state === 'wait-for-picks') {
-      this.mypick = piece;
-      this.lastpick = this.mypick;
-      this.lastguess = this.guess;
-      this.fantascatti.pickPiece(this.table, this.shared.player, piece).subscribe(r => {
-        // loading?
-      });
-    }
-  }
-
   pickByShape(shape: string) {
-    if (this.mypick === null && this.state === 'wait-for-picks') {
+    if (this.mypick === null && this.state === 'wait-for-picks' && (!this.timeDial || this.timeDial.score > 0)) {
       this.mypick = this.piecesmap[shape];
       this.lastpick = this.mypick;
       this.lastguess = this.guess;
