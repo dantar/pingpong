@@ -37,6 +37,16 @@ import {
         animate('400ms', style({'transform-origin': 'center', transform: 'rotateY(-90deg)'})),
       ]),
     ]),
+    trigger('fade', [
+      transition(':enter', [
+        style({opacity: 0}), 
+        animate('400ms', style({opacity:1})),
+      ]),
+      transition(':leave', [
+        style({opacity: 1}), 
+        animate('400ms', style({opacity:0})),
+      ]),
+    ]),
   ]
 })
 export class GameRoomComponent implements OnInit, OnDestroy {
@@ -53,6 +63,8 @@ export class GameRoomComponent implements OnInit, OnDestroy {
   table: TableDto;
   guess: FantascattiCardDto;
   lastguess: FantascattiCardDto;
+
+  cleared: boolean;
 
   guessKey: string;
 
@@ -74,6 +86,7 @@ export class GameRoomComponent implements OnInit, OnDestroy {
   quitting: boolean;
 
   ngOnInit(): void {
+    this.cleared = true;
     this.quitting = false;
     this.pieces = [
       {shape: 'dragon', color: 'red'},
@@ -170,22 +183,26 @@ export class GameRoomComponent implements OnInit, OnDestroy {
   onPlayerPicksPiece(dto: PlayerPicksPieceDto) {
     this.moves.push(dto);
     if (dto.score) {
+      this.lastguess = this.guess;
       this.score = dto.score;
       this.resetTurn();
     } else if (this.moves.length >= this.players.length) {
       this.resetTurn();
     }
+    if (dto.guess) {
+      this.initGuessKey(dto.guess);
+    }
   }
   onNewGuess(dto: NewGuessDto) {
+    this.initGuessKey(dto.guess);
+  }
+  initGuessKey(guess: FantascattiCardDto) {
     this.moves = [];
-    this.guess = dto.guess;
-    this.initGuessKey();
+    this.guess = guess;
     this.state = 'wait-for-picks';
     this.changes.detectChanges();
     this.lastpick = null;
     this.lastguess = null;
-  }
-  initGuessKey() {
     if (this.guess.shape1.localeCompare(this.guess.shape2) < 0 ) {
       this.guessKey = this.guess.shape1 + '-' + this.guess.shape2;
     } else {
@@ -266,6 +283,10 @@ export class GameRoomComponent implements OnInit, OnDestroy {
         // loading?
       });
     }
+  }
+
+  flipDone(event: AnimationEvent) {
+    console.log(event);
   }
 
 }

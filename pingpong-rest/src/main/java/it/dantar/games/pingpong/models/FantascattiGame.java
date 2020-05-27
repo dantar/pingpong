@@ -14,6 +14,7 @@ public class FantascattiGame {
 	FantascattiCardDto guess;
 	Map<String, Integer> score = new HashMap<>();
 	String tableId;
+	Boolean noWait = false;
 
 	public FantascattiCardDto getGuess() {
 		return guess;
@@ -46,8 +47,16 @@ public class FantascattiGame {
 	public Set<String> getPicks() {
 		return picks;
 	}
-	public void setPicks(Set<String> picks) {
+	public FantascattiGame setPicks(Set<String> picks) {
 		this.picks = picks;
+		return this;
+	}
+	public Boolean getNoWait() {
+		return noWait;
+	}
+	public FantascattiGame setNoWait(Boolean noWait) {
+		this.noWait= noWait ;
+		return this;
 	}
 	
 }

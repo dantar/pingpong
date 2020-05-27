@@ -24,6 +24,7 @@ export class PlayerPicksPieceDto extends FantascattiSseDto {
     piece: FantascattiPiece;
     player: PlayerDto;
     score: {[id: string]: number};
+    guess: FantascattiCardDto;
 }
 export class PlayerQuitDto extends FantascattiSseDto {
     static CODE = 'player-quit';

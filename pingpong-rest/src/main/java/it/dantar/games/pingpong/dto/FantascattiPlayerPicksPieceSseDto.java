@@ -14,6 +14,7 @@ public class FantascattiPlayerPicksPieceSseDto extends SseDto {
 	PlayerDto player;
 	FantascattiPiece piece;
 	Map<String, Integer> score;
+	FantascattiCardDto guess;
 
 	public PlayerDto getPlayer() {
 		return player;
@@ -34,6 +35,13 @@ public class FantascattiPlayerPicksPieceSseDto extends SseDto {
 	}
 	public FantascattiPlayerPicksPieceSseDto setScore(Map<String, Integer> score) {
 		this.score = score;
+		return this;
+	}
+	public FantascattiCardDto getGuess() {
+		return guess;
+	}
+	public FantascattiPlayerPicksPieceSseDto setGuess(FantascattiCardDto guess) {
+		this.guess = guess;
 		return this;
 	}
 

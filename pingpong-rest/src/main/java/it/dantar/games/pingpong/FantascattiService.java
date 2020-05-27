@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,18 +94,26 @@ public class FantascattiService {
 		FantascattiGame game = this.games.get(gameId);
 		boolean correct = piece.getShape().equals(game.getGuess().getCorrect());
 		if (correct) {
+			Logger.getLogger(this.getClass().getSimpleName()).info("Score for " + playerId + ": " + game.getScore().get(playerId));
 			game.getScore().put(playerId, game.getScore().get(playerId) == null ? 1 : game.getScore().get(playerId) +1);
+			Logger.getLogger(this.getClass().getSimpleName()).info("now goes to " + game.getScore().get(playerId));
 		}
-		this.tablesService.broadcastMessageToTable(game.getTableId(), new FantascattiPlayerPicksPieceSseDto()
+		FantascattiPlayerPicksPieceSseDto event = new FantascattiPlayerPicksPieceSseDto()
 				.setPlayer(tablesService.getPlayer(playerId))
 				.setPiece(piece)
-				.setScore(correct ? game.getScore() : null)
-				);
+				;
 		game.getPicks().add(playerId);
-		if (game.getPicks().size() >= this.tablesService.getTable(gameId).getSeats().size()+1) {
+		if (correct || game.getPicks().size() >= this.tablesService.getTable(gameId).getSeats().size()+1) {
 			game.getPicks().clear();
 			game.getReady().clear();
+			event.setScore(game.getScore());
+			if (game.getNoWait()) {				
+				game.setGuess(randomGuess());
+				event.setGuess(game.getGuess())
+				;
+			}
 		}
+		this.tablesService.broadcastMessageToTable(game.getTableId(), event);
 		return true;
 	}
 
